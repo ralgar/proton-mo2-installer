@@ -189,7 +189,6 @@ _install_mo2() {
     fi
     if [[ ! -f "$install_path/nxm-broker.sh" ]] ; then
         cp handlers/nxm-broker.sh "$install_path" || return 1
-        _track_file "$install_path/nxm-broker.sh" || return 1
         chmod u+x "$install_path/nxm-broker.sh" || return 1
     fi
 
@@ -297,7 +296,6 @@ _main() {
                 --title="$_project_name_formal" \
                 --progress \
                 --pulsate \
-                --no-cancel \
                 --auto-close \
                 --width 360 --height 180
             if [[ $_return -eq 0 && $? -eq 0 ]] ; then
@@ -308,17 +306,24 @@ _main() {
                     --height 180 \
                     --text "Installation successful!"
             else
+                _uninstall
                 zenity \
                     --title="$_project_name_formal" \
                     --error \
                     --width 360 \
                     --height 180 \
                     --text "Installation failed or canceled!"
-                _uninstall
                 return 1
             fi ;;
         "Uninstall")
-            _uninstall || return 1 ;;
+            _uninstall || return 1
+            zenity \
+                --title "$_project_name_formal" \
+                --info \
+                --width 360 \
+                --height 180 \
+                --text "Uninstallation completed!"
+            ;;
         *)
             return 1 ;;
     esac
@@ -425,34 +430,22 @@ _track_file() {
 
 _uninstall() {
     local file
-    local game
     local remaining_instances
+    local remove
 
     # Load tracked files for the game instance
     if [[ -f "$instance_path/tracked_files.txt" ]] ; then
         readarray -t remove < "$instance_path/tracked_files.txt"
         remove+=( "$install_path" )
     else
-        zenity \
-            --title="$_project_name_formal" \
-            --warning \
-            --width "240" \
-            --height "120" \
-            --title "$_project_name_formal" \
-            --text "There is nothing to uninstall!"
         printf "\nNothing to uninstall...\n"
         return 1
     fi
 
     # Check for any other game instances before removing everything
-    for game in gamesinfo/* ; do
-        game="${game#*/}"
-        if [[ "${game%.sh}" != "$chosen_game" ]] ; then
-            if [[ -d "$install_path/modorganizer2/${game%.sh}" ]] ; then
-                remaining_instances=true
-            fi
-        fi
-    done
+    if [[ $(find "$install_path/modorganizer2" -mindepth 1 -maxdepth 1 -type d | wc -l) -gt 1 ]] ; then
+        remaining_instances=true
+    fi
 
     # Remove the tracked files
     for file in "${remove[@]}" ; do
