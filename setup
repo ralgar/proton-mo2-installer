@@ -1,0 +1,491 @@
+#!/bin/bash
+# shellcheck disable=SC1090
+# shellcheck disable=SC2154
+
+_project_name="proton-mo2-installer"
+_project_name_formal="Proton MO2 Installer"
+
+MO2_VERSION="2.4.4"
+LOOT_VERSION="0.18.2"
+
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
+install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
+
+# Always triggered on script exit
+_cleanup() {
+    # Remove temp tracking file
+    if [[ -n "$tracked_temp" && -f "$tracked_temp" ]] ; then
+        rm -f "$tracked_temp"
+    fi
+}
+trap _cleanup EXIT 1 2 3 SIGTRAP 6 14 15
+
+# Downloads a file from the specified URL
+# USAGE: download_tool {URL}
+_download_file() {
+    local url="$1"
+
+    if [[ ! -d "$cache_dir" ]] ; then
+        mkdir -p "$cache_dir" || return 1
+    fi
+
+    if [[ ! -f "$cache_dir/${url##*/}" ]] ; then
+        curl -Lo "$cache_dir/${url##*/}" "$url" || return 1
+    fi
+}
+
+# Finds all available Steam libraries (for current user)
+#   - called from _find_game_data()
+_find_steam_libraries() {
+    local library
+    local steam_root_candidates=( \
+        "$(readlink -f "$HOME/.steam/root")" \
+        "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam" \
+    )
+
+    # Find all Steam libraries
+    for library in "${steam_root_candidates[@]}" ; do
+        if [[ -d "$library" ]] ; then
+            local IFS=$'\n'
+
+            if [[ ! -d "$library/steamapps" ]] ; then
+                library="$library/steam"
+            fi
+
+            steam_libraries=( "$library" )
+            steam_libraries+=( \
+                "$(grep -oE '/[^"]+' "$library/steamapps/libraryfolders.vdf")" \
+            )
+        fi
+    done
+
+    # Handle failure
+    if [[ -z "${steam_libraries[*]}" ]] ; then
+        return 1
+    fi
+}
+
+# Find Steam game by APPID
+_find_game_data() {
+    if [[ -z "${steam_libraries[*]}" ]] ; then
+        _find_steam_libraries || return 1
+    fi
+    for lib in "${steam_libraries[@]}" ; do
+        lib="$lib/steamapps"
+        if [[ -d "$lib/compatdata/$game_appid" && -d "$lib/common/$game_steam_subdirectory" ]] ; then
+            game_data="$lib/common/$game_steam_subdirectory"
+            #game_prefix="$lib/compatdata/$game_appid/pfx"
+            return 0
+        fi
+    done
+
+    # Handle Failure
+    return 1
+}
+
+
+#_install_enb() {
+#    _download_file "$game_enb_url"
+#
+#    if bsdtar -C "$game_data" --strip-components 1 --exclude WrapperVersion/d3d11.dll -xvf "$cache_dir/${game_enb_url##*/}" 2> "$tracked_temp" ; then
+#        sed -i "/^x /!d" "$tracked_temp" || return 1
+#        sed -i "s|^x |$game_data/|" "$tracked_temp" || return 1
+#        _track_file "$(tac "$tracked_temp")" || return 1
+#    else
+#        return 1
+#    fi
+#}
+
+#_install_engine_fixes() {
+#    # Part 1
+#    local engine_fixes_part1_url="https://github.com/aers/EngineFixesSkyrim64/releases/download/6.0.2/Part.1.SSE.Engine.Fixes.for.1.5.39-1.5.97.7z"
+#    _download_file "$engine_fixes_part1_url"
+#
+#    # Part 2
+#    local engine_fixes_part2_url="https://github.com/aers/EngineFixesSkyrim64/releases/download/6.0.2/Part.2.skse64.Preloader.TBB.Lib.7z"
+#    _download_file "$engine_fixes_part2_url"
+#    if ! bsdtar -C "$game_data" -xvf "$cache_dir/${engine_fixes_part2_url##*/}" 2> "$tracked_temp" ; then
+#        return 1
+#    fi
+#}
+
+# Install LOOT globally, while checking for existing installation
+_install_loot() {
+    local url="https://github.com/loot/loot/releases/download/$LOOT_VERSION/loot_$LOOT_VERSION-win64.7z"
+    local archive="${url##*/}"
+
+    _download_file "$url"
+
+    if [[ ! -d "$install_path/tools/loot" ]] ; then
+        mkdir -p "$install_path/tools/loot" || return 1
+    fi
+
+    bsdtar -C "$install_path/tools/loot" --strip-components 1 -xf "$cache_dir/$archive" || return 1
+}
+
+_install_main() {
+    echo "# Installing Mod Organizer 2..." ; sleep 1
+    if ! _install_mo2 ; then
+        _return=1
+        return 1
+    fi
+
+    echo "# Installing LOOT..." ; sleep 1
+    if ! _install_loot ; then
+        _return=1
+        return 1
+    fi
+
+    echo "# Installing protonPreloader..." ; sleep 1
+    if ! _install_protonPreloader ; then
+        _return=1
+        return 1
+    fi
+
+    echo "# Installing script extender..." ; sleep 1
+    if ! _install_script_extender ; then
+        _return=1
+        return 1
+    fi
+
+    #if [[ -n "$game_enb_url" ]] ; then
+    #    desc="Install ENB"
+    #    run _install_enb
+    #fi
+
+    echo "# Installing Windows libraries..." ; sleep 1
+    if ! _install_verbs ; then
+        _return=1
+        return 1
+    fi
+
+    echo "# Finished!" ; sleep 1
+}
+
+# Install an MO2 instance for the chosen game
+_install_mo2() {
+    local url="https://github.com/ModOrganizer2/modorganizer/releases/download/v$MO2_VERSION/Mod.Organizer-$MO2_VERSION.7z"
+
+    _download_file "$url" || return 1
+
+    mkdir -p "$instance_path" || return 1
+    _track_file "$instance_path" || return 1
+
+    bsdtar -C "$instance_path" -xf "$cache_dir/${url##*/}" || return 1
+
+    # Create APPID file for nxm-broker
+    echo "$game_appid" > "$instance_path/appid.txt" || return 1
+
+    # Install NXM handlers
+    local share="${XDG_DATA_HOME:-$HOME/.local/share}"
+
+    if [[ ! -d "$share/applications" ]] ; then
+        mkdir -p "$share/applications" || return 1
+    fi
+    if [[ ! -f "$share/applications/nxm-handler.desktop" ]] ; then
+        cp handlers/nxm-handler.desktop "$share/applications" || return 1
+        _track_file "$share/applications/nxm-handler.desktop" || return 1
+        xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
+    fi
+    if [[ ! -f "$install_path/nxm-broker.sh" ]] ; then
+        cp handlers/nxm-broker.sh "$install_path" || return 1
+        _track_file "$install_path/nxm-broker.sh" || return 1
+        chmod u+x "$install_path/nxm-broker.sh" || return 1
+    fi
+
+    # FNIS and Nemesis workarounds
+    mkdir -p "$game_data/Data/tools/GenerateFNIS_for_"{Modders,Users} || return 1
+    _track_file "$game_data/Data/tools" || return 1
+    mkdir -p "$game_data/Data/Nemesis_Engine" || return 1
+    _track_file "$game_data/Data/Nemesis_Engine" || return 1
+}
+
+_install_protonPreloader() {
+    url="https://raw.githubusercontent.com/lazanet/protonPreloader/master/RenameThisFile.exe"
+
+    _download_file "$url" || return 1
+
+    mv "${game_data:?}/$game_executable" "${game_data:?}/$game_executable.bak" || return 1
+    cp "$cache_dir/RenameThisFile.exe" "${game_data:?}/$game_executable" || return 1
+    cat > "${game_data:?}/config.bat" << EOF
+@echo off
+cd /D "%~dp0"
+:: -------------------------------------------
+:: Main script part
+:: -------------------------------------------
+
+:: Launch MO2 instead of the game launcher
+start "Starting ModOrganizer2" "Z:$(sed 's/\//\\\\/g' <<< "$instance_path")\ModOrganizer.exe" %*
+EOF
+    _track_file "${game_data:?}/config.bat"
+}
+
+# Install the game's script extender
+_install_script_extender() {
+    _download_file "$game_scriptextender_url" || return 1
+
+    if [[ $game_scriptextender_strip_dirs -eq 0 ]] ; then
+        if bsdtar -C "$game_data" -xvf "$cache_dir/${game_scriptextender_url##*/}" 2> "$tracked_temp" ; then
+            sed -i "/^x /!d" "$tracked_temp" || return 1
+            sed -i "/^x [dD]ata\/$/d" "$tracked_temp" || return 1
+            sed -i "s|^x |$game_data/|" "$tracked_temp" || return 1
+            _track_file "$(tac "$tracked_temp")" || return 1
+        else
+            return 1
+        fi
+    else
+        if bsdtar -C "$game_data" --strip-components "$game_scriptextender_strip_dirs" \
+            -xvf "$cache_dir/${game_scriptextender_url##*/}" 2> "$tracked_temp"
+        then
+            sed -i "/^x /!d" "$tracked_temp" || return 1
+            sed -i "/^x [dD]ata\/$/d" "$tracked_temp" || return 1
+            sed -i "s|^x |$game_data/|" "$tracked_temp" || return 1
+            _track_file "$(tac "$tracked_temp")" || return 1
+        else
+            return 1
+        fi
+    fi
+
+}
+
+# Install verbs with protontricks
+_install_verbs() {
+    if which protontricks &> /dev/null ; then
+        if [[ -n "$game_protontricks" ]] ; then
+            for verb in "${game_protontricks[@]}" ; do
+                if ! protontricks "$game_appid" -q "$verb" ; then
+                    return 1
+                fi
+            done
+        fi
+    else
+        return 1
+    fi
+}
+
+_main() {
+    if ! zenity \
+        --title="$_project_name_formal" \
+        --window-icon="info" \
+        --width 720 --height 540 \
+        --text-info \
+        --filename dialog.txt \
+        --checkbox "I'm ready to continue"
+    then
+        return 1
+    fi
+
+    _select_game || return 1
+    source "gamesinfo/$chosen_game.sh" || return 1
+    instance_path="$install_path/modorganizer2/$game_nexusid"
+    if ! _find_game_data ; then
+        zenity \
+            --title="$_project_name_formal" \
+            --width 360 \
+            --height 180 \
+            --error \
+            --icon-name "dialog-error" \
+            --no-wrap \
+            --text '\nCould not find specified game!'
+        exit 1
+    fi
+
+    _select_task || return 1
+    case $chosen_task in
+        "Install")
+            _install_main | zenity \
+                --title="$_project_name_formal" \
+                --progress \
+                --pulsate \
+                --no-cancel \
+                --auto-close \
+                --width 360 --height 180
+            if [[ $_return -eq 0 && $? -eq 0 ]] ; then
+                zenity \
+                    --title "$_project_name_formal" \
+                    --info \
+                    --width 360 \
+                    --height 180 \
+                    --text "Installation successful!"
+            else
+                zenity \
+                    --title="$_project_name_formal" \
+                    --error \
+                    --width 360 \
+                    --height 180 \
+                    --text "Installation failed or canceled!"
+                _uninstall
+                return 1
+            fi ;;
+        "Uninstall")
+            _uninstall || return 1 ;;
+        *)
+            return 1 ;;
+    esac
+
+    #_select_tools || return 1
+}
+
+_select_game() {
+    if ! chosen_game="$(zenity \
+        --title="$_project_name_formal" \
+        --width 640 --height 480 \
+        --list \
+        --radiolist \
+        --text "Choose a game:" \
+        --column "Radio Button" \
+        --column "Game List" \
+        --hide-header \
+        --width "480" \
+        --height "360" \
+        FALSE "Enderal" \
+        FALSE "Enderal Special Edition" \
+        FALSE "Fallout 3" \
+        FALSE "Fallout 3 GOTY" \
+        FALSE "Fallout 4" \
+        FALSE "Fallout New Vegas" \
+        FALSE "Fallout New Vegas Russian" \
+        FALSE "Morrowind" \
+        FALSE "Oblivion" \
+        FALSE "Skyrim" \
+        FALSE "Skyrim Special Edition" \
+    )" ; then
+        return 1
+    fi
+
+    chosen_game="${chosen_game// /}"
+    chosen_game="${chosen_game,,}"
+}
+
+# Select the task to perform on chosen game
+_select_task() {
+    if [[ ! -d $instance_path ]] ; then
+        if ! chosen_task="$(zenity \
+            --title="$_project_name_formal" \
+            --width 640 --height 480 \
+            --list \
+            --radiolist \
+            --text "Choose a task:" \
+            --column "Radio Button" \
+            --column "Task List" \
+            --hide-header \
+            --width "480" \
+            --height "360" \
+            FALSE "Install" \
+        )" ; then
+            return 1
+        fi
+    else
+        if ! chosen_task="$(zenity \
+            --title="$_project_name_formal" \
+            --width 640 --height 480 \
+            --list \
+            --radiolist \
+            --text "Choose a task:" \
+            --column "Radio Button" \
+            --column "Task List" \
+            --hide-header \
+            --width "480" \
+            --height "360" \
+            FALSE "Uninstall" \
+        )" ; then
+            return 1
+        fi
+    fi
+}
+
+#_select_tools() {
+#    chosen_tools="$(zenity \
+#        --title="$_project_name_formal" \
+#        --list --checklist --multiple \
+#        --column "Checklist" --column "Tools" \
+#        --hide-header \
+#        FALSE "ENB" \
+#        FALSE "LOOT" \
+#    )"
+#
+#    IFS='|' read -ra tools_array <<< "$chosen_tools"
+#
+#    for tool in "${tools_array[@]}" ; do
+#        printf "%s\n" "$tool"
+#    done
+#}
+
+_track_file() {
+    local file="$1"
+
+    if [[ -z $tracked_temp ]] ; then
+        tracked_temp="$(mktemp)" || return 1
+    fi
+
+    if ! grep "$file" "$instance_path/tracked_files.txt" &> /dev/null ; then
+        echo "$file" >> "$instance_path/tracked_files.txt" || return 1
+    fi
+}
+
+_uninstall() {
+    local file
+    local game
+    local remaining_instances
+
+    # Load tracked files for the game instance
+    if [[ -f "$instance_path/tracked_files.txt" ]] ; then
+        readarray -t remove < "$instance_path/tracked_files.txt"
+        remove+=( "$install_path" )
+    else
+        zenity \
+            --title="$_project_name_formal" \
+            --warning \
+            --width "240" \
+            --height "120" \
+            --title "$_project_name_formal" \
+            --text "There is nothing to uninstall!"
+        printf "\nNothing to uninstall...\n"
+        return 1
+    fi
+
+    # Check for any other game instances before removing everything
+    for game in gamesinfo/* ; do
+        game="${game#*/}"
+        if [[ "${game%.sh}" != "$chosen_game" ]] ; then
+            if [[ -d "$install_path/modorganizer2/${game%.sh}" ]] ; then
+                remaining_instances=true
+            fi
+        fi
+    done
+
+    # Remove the tracked files
+    for file in "${remove[@]}" ; do
+        if [[ "$file" =~ ${_project_name}$|nxm-handler ]] ; then
+            if [[ ( -e "$file" || -L "$file" ) && "$remaining_instances" != true ]] ; then
+                rm -rf "$file" || return 1
+                printf "Removed:  %s\n" "$file"
+            else
+                printf "Skipped:  %s\n" "$file"
+            fi
+        else
+            if [[ -e "$file" || -L "$file" ]] ; then
+                rm -rf "$file" || return 1
+                printf "Removed:  %s\n" "$file"
+            fi
+        fi
+    done
+
+    # Restore any .bak files in the game dir
+    for file in "${game_data:?}"/*.bak ; do
+        rm -rf "${file%.bak}"
+        mv "$file" "${file%.bak}"
+        printf "Restored: %s\n" "${file%.bak}"
+    done
+
+    if [[ "$remaining_instances" = true ]] ; then
+        printf "\nInstances were detected for other games, some files were not removed.\n"
+    fi
+    printf "\nUninstall completed!\n"
+}
+
+if _main ; then
+    exit 0
+else
+    exit 1
+fi
