@@ -33,7 +33,7 @@ These dependencies should be available out-of-the-box on most systems:
 Installation is simple:
 1. Install your chosen game through Steam.
 2. Launch the game once to initialize the Proton prefix, and adjust your graphics settings.
-3. Grab the latest stable release of the installer [here](https://github.com/ralgar/steamplay-skyrim-tools/releases), or simply `git clone` the repo.
+3. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases), or simply `git clone` the repo.
 4. Run `setup`, and follow the prompts until finished.
 5. Launch the game from Steam. It will now launch MO2 instead.
 
@@ -59,21 +59,21 @@ Installing Additional Mod Tools:
 ## Supported Games
 
 The following is a small overview of the current state of each supported game:<br>
-Note: Much of this data is carried over from [lutris-skyrimse-installers](https://github.com/rockerbacon/lutris-skyrimse-installers)
+Note: Much of this data is carried over from [modorganizer2-linux-installer](https://github.com/rockerbacon/modorganizer2-linux-installer)
 
 | GAME                   | GAMEPLAY        | SCRIPT EXTENDER           | ENB           |
 | :--------------------- | :-------------- | :------------------------ | :------------ |
 | Fallout 3              | not tested      | not tested                | not tested    |
-| Fallout 4              | working         | [some plugins might not work](https://github.com/rockerbacon/lutris-skyrimse-installers/issues/32) | ENB v0.393 or older, disabling "EnablePostPassShader" might be necessary |
+| Fallout 4              | working         | [some plugins might not work](https://github.com/rockerbacon/modorganizer2-linux-installer/issues/32) | ENB v0.393 or older, disabling "EnablePostPassShader" might be necessary |
 | Fallout New Vegas      | fullscreen only | working                   | working       |
 | Morrowind              | not tested      | not tested                | not tested    |
-| Oblivion               | working         | [some plugins might require manual setup](https://github.com/rockerbacon/lutris-skyrimse-installers/issues/63#issuecomment-643690247)                 | not tested    |
+| Oblivion               | working         | [some plugins might require manual setup](https://github.com/rockerbacon/modorganizer2-linux-installer/issues/63#issuecomment-643690247)                 | not tested    |
 | Skyrim                 | working         | working                   | working       |
 | Skyrim Special Edition | working         | working                   | working       |
 
-For known bugs and workarounds, please refer to the [issues page](https://github.com/ralgar/steamplay-skyrim-tools/issues?q=is:issue+is:open+label:bug+)
+For known bugs and workarounds, please refer to the [issues page](https://github.com/ralgar/proton-mo2-installer/issues?q=is:issue+is:open+label:bug+)
 
-Please help to keep this table up to date by [opening issues](https://github.com/ralgar/steamplay-skyrim-tools/issues/new/choose) with any problems you encounter.
+Please help to keep this table up to date by [opening issues](https://github.com/ralgar/proton-mo2-installer/issues/new/choose) with any problems you encounter.
 
 
 ## Updating the tools
@@ -83,7 +83,7 @@ If you do feel the need, updating is a fairly simple process thanks to the inclu
 
 Here is what you need to do in order to update:
 
-1. Backup your game's Mod Organizer 2 instance (`~/.local/share/steamplay-skyrim-tools/modorganizer2/<chosen-game>`)
+1. Backup your game's Mod Organizer 2 instance (`~/.local/share/proton-mo2-installer/modorganizer2/<chosen-game>`)
 2. Run `setup`, following the prompts to *Uninstall*
 3. Run `setup` again, following the prompts to *Install*
 4. Copy the following files and directories from your backup to the fresh Mod Organizer 2 instance:
