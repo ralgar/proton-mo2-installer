@@ -22,7 +22,7 @@ This project aims to make modding Bethesda games on Linux as simple as possible.
 You may need to install the following dependencies:
 - bsdtar
 - protontricks
-- protontricks-launcher - this should be available after installing protontricks already, if not see [this](https://github.com/Matoking/protontricks#desktop)
+- protontricks-launch - this command should be available after installing protontricks, if not see [this](https://github.com/Matoking/protontricks#desktop)
 
 These dependencies should be available out-of-the-box on most systems:
 - curl
