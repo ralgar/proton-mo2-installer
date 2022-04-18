@@ -1,5 +1,1 @@
-*~
-*.swp
-*.swo
-
-/gamesinfo/gamesinfo.tar.gz
+venv/
