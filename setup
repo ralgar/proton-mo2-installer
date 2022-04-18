@@ -10,6 +10,7 @@ LOOT_VERSION="0.18.2"
 
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
 install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
+script_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 
 # Always triggered on script exit
 _cleanup() {
@@ -114,7 +115,7 @@ _install_loot() {
     local url="https://github.com/loot/loot/releases/download/$LOOT_VERSION/loot_$LOOT_VERSION-win64.7z"
     local archive="${url##*/}"
 
-    _download_file "$url"
+    _download_file "$url" || return 1
 
     if [[ ! -d "$install_path/tools/loot" ]] ; then
         mkdir -p "$install_path/tools/loot" || return 1
@@ -183,12 +184,12 @@ _install_mo2() {
         mkdir -p "$share/applications" || return 1
     fi
     if [[ ! -f "$share/applications/nxm-handler.desktop" ]] ; then
-        cp handlers/nxm-handler.desktop "$share/applications" || return 1
+        cp "$script_dir/handlers/nxm-handler.desktop" "$share/applications" || return 1
         _track_file "$share/applications/nxm-handler.desktop" || return 1
         xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
     fi
     if [[ ! -f "$install_path/nxm-broker.sh" ]] ; then
-        cp handlers/nxm-broker.sh "$install_path" || return 1
+        cp "$script_dir/handlers/nxm-broker.sh" "$install_path" || return 1
         chmod u+x "$install_path/nxm-broker.sh" || return 1
     fi
 
@@ -268,14 +269,14 @@ _main() {
         --window-icon="info" \
         --width 720 --height 540 \
         --text-info \
-        --filename dialog.txt \
+        --filename "$script_dir/dialog.txt" \
         --checkbox "I'm ready to continue"
     then
         return 1
     fi
 
     _select_game || return 1
-    source "gamesinfo/$chosen_game.sh" || return 1
+    source "$script_dir/gamesinfo/$chosen_game.sh" || return 1
     instance_path="$install_path/modorganizer2/$game_nexusid"
     if ! _find_game_data ; then
         zenity \
