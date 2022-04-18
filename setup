@@ -125,29 +125,18 @@ _install_loot() {
 }
 
 _install_main() {
+
     echo "# Installing Mod Organizer 2..." ; sleep 1
-    if ! _install_mo2 ; then
-        _return=1
-        return 1
-    fi
+    _install_mo2 || return 1
 
     echo "# Installing LOOT..." ; sleep 1
-    if ! _install_loot ; then
-        _return=1
-        return 1
-    fi
+    _install_loot || return 1
 
     echo "# Installing protonPreloader..." ; sleep 1
-    if ! _install_protonPreloader ; then
-        _return=1
-        return 1
-    fi
+    _install_protonPreloader || return 1
 
     echo "# Installing script extender..." ; sleep 1
-    if ! _install_script_extender ; then
-        _return=1
-        return 1
-    fi
+    _install_script_extender || return 1
 
     #if [[ -n "$game_enb_url" ]] ; then
     #    desc="Install ENB"
@@ -155,10 +144,7 @@ _install_main() {
     #fi
 
     echo "# Installing Windows libraries..." ; sleep 1
-    if ! _install_verbs ; then
-        _return=1
-        return 1
-    fi
+    _install_verbs || return 1
 
     echo "# Finished!" ; sleep 1
 }
@@ -299,7 +285,7 @@ _main() {
                 --pulsate \
                 --auto-close \
                 --width 360 --height 180
-            if [[ $_return -eq 0 && $? -eq 0 ]] ; then
+            if [[ ${PIPESTATUS[0]} -eq 0 && ${PIPESTATUS[1]} -eq 0 ]] ; then
                 zenity \
                     --title "$_project_name_formal" \
                     --info \
