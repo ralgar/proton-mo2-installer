@@ -29,13 +29,13 @@ _check_dependencies() {
     for dependency in "${dependencies[@]}" ; do
         if ! which "$dependency" &> /dev/null ; then
             printf "\nERROR: Missing dependency: %s\n\n" "$dependency"
-            _dialog error missing_dependencies
             missing_dependencies+=( "$dependency" )
         fi
     done
 
     # If any dependencies are missing, return failure
     if [[ -n ${missing_dependencies[*]} ]] ; then
+        _dialog error missing_dependencies
         return 1
     fi
 }
