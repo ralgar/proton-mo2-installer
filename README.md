@@ -14,15 +14,18 @@ This project aims to make modding Bethesda games on Linux as simple as possible.
 - [x] Installs Mod Organizer 2
 - [x] Installs LOOT
 - [x] Installs Script Extender
+- [x] Launching the game from Steam launches MO2 instead
+- [x] NXM links from your browser are recognized by MO2
+- [x] DynDoLOD, FNIS, Nemesis, BodySlide and Outfit Studio, and other tools work as expected
+- [ ] Flatpak Steam support (needs some work still)
 
 
 ## Getting Started
 
 ### Prerequisites
-You may need to install the following dependencies:
+You may need to manually install the following dependencies:
 - bsdtar
 - protontricks
-- protontricks-launch - this command should be available after installing protontricks, if not see [this](https://github.com/Matoking/protontricks#desktop)
 
 These dependencies should be available out-of-the-box on most systems:
 - curl
