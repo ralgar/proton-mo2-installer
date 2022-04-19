@@ -60,6 +60,14 @@ _dialog() {
                         --no-wrap --ellipsize \
                         --text '\nCould not locate the chosen game!'
                     ;;
+                no_steam)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nCould not find Steam data!'
+                    ;;
             esac
             ;;
 
@@ -99,38 +107,83 @@ _dialog() {
     esac
 }
 
+_find_steam_libraries() {
+
+    # Find Steam root library VDF file
+    # NOTE: `find` does not provide a useful return code, so
+    #   we must use other logic to determine success
+    vdf_file="$(find "$HOME" \
+        ! -path '*/compatdata/*' \
+        ! -path '*/config/*' \
+        -name libraryfolders.vdf \
+        -print -quit \
+        2> /dev/null \
+    )"
+
+    # Ensure we found a VDF file
+    if [[ ! -f "$vdf_file" ]] ; then
+        printf "\nERROR: Unable to find a Steam installation for user.\n\n"
+        _dialog error no_steam
+        return 1
+    fi
+
+    # Read the VDF file
+    steam_libraries=()
+    while read -r line ; do
+        if [[ $line =~ "path" ]] ; then
+            printf "INFO: Found Steam library: %s\n" \
+                "$(echo "$line" | awk '{ print $2 }' | sed s/\"//g)"
+            steam_libraries+=( "$(echo "$line" | awk '{ print $2 }' | sed s/\"//g)" )
+        fi
+    done <"$vdf_file"
+
+    # If we didn't find a library, return failure
+    if [[ -z ${steam_libraries[*]} ]] ; then
+        printf "\nERROR: Unable to find any Steam libraries in root VDF file.\n\n"
+        _dialog error no_steam
+        return 1
+    fi
+}
 
 # Find Steam game by APPID
 _find_game_data() {
 
-    # Attempt to find a manifest file for APPID
-    manifest="$(find "$HOME" -name "appmanifest_$game_appid.acf" 2> /dev/null)"
+    # Get a list of all Steam libraries `${steam_libraries[@]}`
+    _find_steam_libraries || return 1
 
-    # If the manifest file exists, use it to get
-    #   the library path, else return failure
-    if [[ -f $manifest ]] ; then
-        library="$(dirname "$manifest")"
-    else
+    # If the game manifest is found in a library, set $game_library
+    # NOTE: `find` does not provide a useful return code, so
+    #   we must use other logic to determine success
+    for library in "${steam_libraries[@]}" ; do
+        manifest="$(find "$library" -name "appmanifest_$game_appid.acf" 2> /dev/null)"
+        if [[ -f $manifest ]] ; then
+            game_library="$(dirname "$manifest")"
+            break
+        fi
+    done
+
+    # Return failure if the game cannot be found in a library
+    if [[ ! -d $game_library ]] ; then
         printf "\nERROR: Game is not installed.\n\n"
         _dialog error no_game_data
         return 1
     fi
 
     # Return failure if no prefix is found
-    if [[ ! -d "$library/compatdata/$game_appid" ]] ; then
+    if [[ ! -d "$game_library/compatdata/$game_appid" ]] ; then
         printf "\nWARNING: The prefix is missing. Run the game first, and try again.\n\n"
         _dialog warn no_game_prefix
         return 1
     fi
 
     # Return success if game data is found in library
-    if [[ -d "$library/common/$game_steam_subdirectory" ]] ; then
-        printf "\nFound game in library: %s\n\n" "$library"
-        game_data="$library/common/$game_steam_subdirectory"
+    if [[ -d "$game_library/common/$game_steam_subdirectory" ]] ; then
+        printf "INFO: Found game in library: %s\n" "$library"
+        game_data="$game_library/common/$game_steam_subdirectory"
         return 0
     fi
 
-    # Handle failure
+    # Handle missing game data, or other unknown failure.
     printf "\nERROR: Game is installed, but the data directory is missing.\n\n"
     _dialog error no_game_data
     return 1
