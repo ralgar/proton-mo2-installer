@@ -35,6 +35,71 @@ _download_file() {
     fi
 }
 
+# Displays dialog boxes
+_dialog() {
+
+    local width=360
+    local height=180
+
+    case $1 in
+        error)
+            case $2 in
+                installation_failed)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nInstallation failed!'
+                    ;;
+                no_game_data)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nCould not locate the chosen game!'
+                    ;;
+            esac
+            ;;
+
+        info)
+            case $2 in
+                installation_success)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --info --icon-name "dialog-info" \
+                        --no-wrap --ellipsize \
+                        --text '\nInstallation completed successfully!'
+                    ;;
+                uninstallation_complete)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --info --icon-name "dialog-info" \
+                        --no-wrap --ellipsize \
+                        --text '\nUninstallation complete!'
+                    ;;
+            esac
+            ;;
+
+        warn)
+            case $2 in
+                no_game_prefix)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nCould not locate the game prefix!'
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+
 # Find Steam game by APPID
 _find_game_data() {
 
@@ -46,23 +111,28 @@ _find_game_data() {
     if [[ -f $manifest ]] ; then
         library="$(dirname "$manifest")"
     else
+        printf "\nERROR: Game is not installed.\n\n"
+        _dialog error no_game_data
         return 1
     fi
 
     # Return failure if no prefix is found
     if [[ ! -d "$library/compatdata/$game_appid" ]] ; then
-        printf "\nNo prefix found. Run the game once and try again."
+        printf "\nWARNING: The prefix is missing. Run the game first, and try again.\n\n"
+        _dialog warn no_game_prefix
         return 1
     fi
 
     # Return success if game data is found in library
     if [[ -d "$library/common/$game_steam_subdirectory" ]] ; then
+        printf "\nFound game in library: %s\n\n" "$library"
         game_data="$library/common/$game_steam_subdirectory"
         return 0
     fi
 
     # Handle failure
-    printf "\nCould not find game data in library"
+    printf "\nERROR: Game is installed, but the data directory is missing.\n\n"
+    _dialog error no_game_data
     return 1
 }
 
@@ -243,20 +313,11 @@ _main() {
         return 1
     fi
 
+    # Run the Select Game menu
     _select_game || return 1
     source "$script_dir/gamesinfo/$chosen_game.sh" || return 1
     instance_path="$install_path/modorganizer2/$game_nexusid"
-    if ! _find_game_data ; then
-        zenity \
-            --title="$_project_name_formal" \
-            --width 360 \
-            --height 180 \
-            --error \
-            --icon-name "dialog-error" \
-            --no-wrap \
-            --text '\nCould not find specified game!'
-        exit 1
-    fi
+    _find_game_data || return 1
 
     _select_task || return 1
     case $chosen_task in
@@ -268,30 +329,15 @@ _main() {
                 --auto-close \
                 --width 360 --height 180
             if [[ ${PIPESTATUS[0]} -eq 0 && ${PIPESTATUS[1]} -eq 0 ]] ; then
-                zenity \
-                    --title "$_project_name_formal" \
-                    --info \
-                    --width 360 \
-                    --height 180 \
-                    --text "Installation successful!"
+                _dialog info installation_success
             else
                 _uninstall
-                zenity \
-                    --title="$_project_name_formal" \
-                    --error \
-                    --width 360 \
-                    --height 180 \
-                    --text "Installation failed or canceled!"
+                _dialog error installation_failed
                 return 1
             fi ;;
         "Uninstall")
             _uninstall || return 1
-            zenity \
-                --title "$_project_name_formal" \
-                --info \
-                --width 360 \
-                --height 180 \
-                --text "Uninstallation completed!"
+            _dialog info uninstallation_complete
             ;;
         *)
             return 1 ;;
