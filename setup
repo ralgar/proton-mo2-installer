@@ -35,52 +35,34 @@ _download_file() {
     fi
 }
 
-# Finds all available Steam libraries (for current user)
-#   - called from _find_game_data()
-_find_steam_libraries() {
-    local library
-    local steam_root_candidates=( \
-        "$(readlink -f "$HOME/.steam/root")" \
-        "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam" \
-    )
-
-    # Find all Steam libraries
-    for library in "${steam_root_candidates[@]}" ; do
-        if [[ -d "$library" ]] ; then
-            local IFS=$'\n'
-
-            if [[ ! -d "$library/steamapps" ]] ; then
-                library="$library/steam"
-            fi
-
-            steam_libraries=( "$library" )
-            steam_libraries+=( \
-                "$(grep -oE '/[^"]+' "$library/steamapps/libraryfolders.vdf")" \
-            )
-        fi
-    done
-
-    # Handle failure
-    if [[ -z "${steam_libraries[*]}" ]] ; then
-        return 1
-    fi
-}
-
 # Find Steam game by APPID
 _find_game_data() {
-    if [[ -z "${steam_libraries[*]}" ]] ; then
-        _find_steam_libraries || return 1
-    fi
-    for lib in "${steam_libraries[@]}" ; do
-        lib="$lib/steamapps"
-        if [[ -d "$lib/compatdata/$game_appid" && -d "$lib/common/$game_steam_subdirectory" ]] ; then
-            game_data="$lib/common/$game_steam_subdirectory"
-            #game_prefix="$lib/compatdata/$game_appid/pfx"
-            return 0
-        fi
-    done
 
-    # Handle Failure
+    # Attempt to find a manifest file for APPID
+    manifest="$(find "$HOME" -name "appmanifest_$game_appid.acf" 2> /dev/null)"
+
+    # If the manifest file exists, use it to get
+    #   the library path, else return failure
+    if [[ -f $manifest ]] ; then
+        library="$(dirname "$manifest")"
+    else
+        return 1
+    fi
+
+    # Return failure if no prefix is found
+    if [[ ! -d "$library/compatdata/$game_appid" ]] ; then
+        printf "\nNo prefix found. Run the game once and try again."
+        return 1
+    fi
+
+    # Return success if game data is found in library
+    if [[ -d "$library/common/$game_steam_subdirectory" ]] ; then
+        game_data="$library/common/$game_steam_subdirectory"
+        return 0
+    fi
+
+    # Handle failure
+    printf "\nCould not find game data in library"
     return 1
 }
 
