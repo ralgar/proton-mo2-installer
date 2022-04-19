@@ -12,6 +12,34 @@ cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
 install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
 script_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 
+# Make sure dependencies are installed
+_check_dependencies() {
+
+    local dependencies=( \
+        "bsdtar" \
+        "curl" \
+        "protontricks" \
+        "protontricks-launch" \
+        "xdg-mime" \
+        "zenity" \
+    )
+    local missing_dependencies=()
+
+    # Loop through the dependencies, making sure they're available
+    for dependency in "${dependencies[@]}" ; do
+        if ! which "$dependency" &> /dev/null ; then
+            printf "\nERROR: Missing dependency: %s\n\n" "$dependency"
+            _dialog error missing_dependencies
+            missing_dependencies+=( "$dependency" )
+        fi
+    done
+
+    # If any dependencies are missing, return failure
+    if [[ -n ${missing_dependencies[*]} ]] ; then
+        return 1
+    fi
+}
+
 # Always triggered on script exit
 _cleanup() {
     # Remove temp tracking file
@@ -52,6 +80,14 @@ _dialog() {
                         --no-wrap --ellipsize \
                         --text '\nInstallation failed!'
                     ;;
+                missing_dependencies)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nMissing dependencies!'
+                    ;;
                 no_game_data)
                     zenity \
                         --title="$_project_name_formal" \
@@ -66,7 +102,7 @@ _dialog() {
                         --width "$width" --height "$height" \
                         --error --icon-name "dialog-error" \
                         --no-wrap --ellipsize \
-                        --text '\nCould not find Steam data!'
+                        --text '\nCould not locate Steam data!'
                     ;;
             esac
             ;;
@@ -355,6 +391,9 @@ _install_verbs() {
 }
 
 _main() {
+
+    _check_dependencies || return 1
+
     if ! zenity \
         --title="$_project_name_formal" \
         --window-icon="info" \
