@@ -419,6 +419,7 @@ _main() {
                 --progress \
                 --pulsate \
                 --auto-close \
+                --no-cancel \
                 --width 360 --height 180
             if [[ ${PIPESTATUS[0]} -eq 0 && ${PIPESTATUS[1]} -eq 0 ]] ; then
                 _dialog info installation_success
