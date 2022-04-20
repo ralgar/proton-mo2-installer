@@ -1,6 +1,17 @@
 #!/bin/bash
+#
 # shellcheck disable=SC1090
 # shellcheck disable=SC2154
+#
+# setup.sh - An installer for Mod Organizer 2, and other tools, on Steam for Linux.
+#
+# This script is run by the user, and is capable of bootstrapping and removing
+#   modding instances for Bethesda games running under Steam Play on Linux.
+#
+# Copyright: (c) 2022, Ryan Algar (https://github.com/ralgar/proton-mo2-installer)
+#
+# GNU General Public License v3.0 (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 
 _project_name="proton-mo2-installer"
 _project_name_formal="Proton MO2 Installer"
@@ -11,6 +22,7 @@ LOOT_VERSION="0.18.2"
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
 install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
 script_dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
+
 
 # Make sure dependencies are installed
 _check_dependencies() {
@@ -40,8 +52,10 @@ _check_dependencies() {
     fi
 }
 
-# Always triggered on script exit
+
+# Triggered on script exit
 _cleanup() {
+
     # Remove temp tracking file
     if [[ -n "$tracked_temp" && -f "$tracked_temp" ]] ; then
         rm -f "$tracked_temp"
@@ -49,9 +63,11 @@ _cleanup() {
 }
 trap _cleanup EXIT 1 2 3 SIGTRAP 6 14 15
 
+
 # Downloads a file from the specified URL
 # USAGE: download_tool {URL}
 _download_file() {
+
     local url="$1"
 
     if [[ ! -d "$cache_dir" ]] ; then
@@ -62,6 +78,7 @@ _download_file() {
         curl -Lo "$cache_dir/${url##*/}" "$url" || return 1
     fi
 }
+
 
 # Displays dialog boxes
 _dialog() {
@@ -143,6 +160,7 @@ _dialog() {
     esac
 }
 
+
 _find_steam_libraries() {
 
     # Find Steam root library VDF file
@@ -180,6 +198,7 @@ _find_steam_libraries() {
         return 1
     fi
 }
+
 
 # Find Steam game by APPID
 _find_game_data() {
@@ -227,6 +246,7 @@ _find_game_data() {
 
 
 #_install_enb() {
+#
 #    _download_file "$game_enb_url"
 #
 #    if bsdtar -C "$game_data" --strip-components 1 --exclude WrapperVersion/d3d11.dll -xvf "$cache_dir/${game_enb_url##*/}" 2> "$tracked_temp" ; then
@@ -238,7 +258,9 @@ _find_game_data() {
 #    fi
 #}
 
+
 #_install_engine_fixes() {
+#
 #    # Part 1
 #    local engine_fixes_part1_url="https://github.com/aers/EngineFixesSkyrim64/releases/download/6.0.2/Part.1.SSE.Engine.Fixes.for.1.5.39-1.5.97.7z"
 #    _download_file "$engine_fixes_part1_url"
@@ -251,8 +273,10 @@ _find_game_data() {
 #    fi
 #}
 
+
 # Install LOOT globally, while checking for existing installation
 _install_loot() {
+
     local url="https://github.com/loot/loot/releases/download/$LOOT_VERSION/loot_$LOOT_VERSION-win64.7z"
     local archive="${url##*/}"
 
@@ -264,6 +288,7 @@ _install_loot() {
 
     bsdtar -C "$install_path/tools/loot" --strip-components 1 -xf "$cache_dir/$archive" || return 1
 }
+
 
 _install_main() {
 
@@ -290,8 +315,10 @@ _install_main() {
     echo "# Finished!" ; sleep 1
 }
 
+
 # Install an MO2 instance for the chosen game
 _install_mo2() {
+
     local url="https://github.com/ModOrganizer2/modorganizer/releases/download/v$MO2_VERSION/Mod.Organizer-$MO2_VERSION.7z"
 
     _download_file "$url" || return 1
@@ -327,7 +354,9 @@ _install_mo2() {
     _track_file "$game_data/Data/Nemesis_Engine" || return 1
 }
 
+
 _install_protonPreloader() {
+
     url="https://raw.githubusercontent.com/lazanet/protonPreloader/master/RenameThisFile.exe"
 
     _download_file "$url" || return 1
@@ -347,8 +376,10 @@ EOF
     _track_file "${game_data:?}/config.bat"
 }
 
+
 # Install the game's script extender
 _install_script_extender() {
+
     _download_file "$game_scriptextender_url" || return 1
 
     if [[ $game_scriptextender_strip_dirs -eq 0 ]] ; then
@@ -375,8 +406,10 @@ _install_script_extender() {
 
 }
 
+
 # Install verbs with protontricks
 _install_verbs() {
+
     if which protontricks &> /dev/null ; then
         if [[ -n "$game_protontricks" ]] ; then
             for verb in "${game_protontricks[@]}" ; do
@@ -389,6 +422,7 @@ _install_verbs() {
         return 1
     fi
 }
+
 
 _main() {
 
@@ -439,7 +473,9 @@ _main() {
     #_select_tools || return 1
 }
 
+
 _select_game() {
+
     if ! chosen_game="$(zenity \
         --title="$_project_name_formal" \
         --width 640 --height 480 \
@@ -469,6 +505,7 @@ _select_game() {
     chosen_game="${chosen_game// /}"
     chosen_game="${chosen_game,,}"
 }
+
 
 # Select the task to perform on chosen game
 _select_task() {
@@ -507,7 +544,9 @@ _select_task() {
     fi
 }
 
+
 #_select_tools() {
+#
 #    chosen_tools="$(zenity \
 #        --title="$_project_name_formal" \
 #        --list --checklist --multiple \
@@ -524,7 +563,9 @@ _select_task() {
 #    done
 #}
 
+
 _track_file() {
+
     local file="$1"
 
     if [[ -z $tracked_temp ]] ; then
@@ -536,7 +577,9 @@ _track_file() {
     fi
 }
 
+
 _uninstall() {
+
     local file
     local remaining_instances
     local remove
@@ -584,6 +627,7 @@ _uninstall() {
     fi
     printf "\nUninstall completed!\n"
 }
+
 
 if _main ; then
     exit 0
