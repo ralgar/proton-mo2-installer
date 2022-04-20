@@ -1,13 +1,13 @@
-========================================
-===     Welcome to SteamPlay Skyrim Tools!
-========================================
+======================================
+===     Welcome to Proton MO2 Installer!
+======================================
 
 Instructions:
-    1. Install the game through Steam
+    1. Install your game through Steam
     2. Run the game at least once to initialize the prefix
     3. Check the box below and follow the prompts until finished
     4. Launch the game from Steam. It will now launch MO2 instead.
 
-Note: Installing the WINE packages can take a long time in some cases. Please be patient, the process will finish eventually.
+Note: Configuring the prefix can take a long time in some cases. Please be patient, the process will finish eventually.
 
-Visit https://github.com/ralgar/steamplay-skyrim-tools for more info.
+Visit https://github.com/ralgar/proton-mo2-installer for more info.
