@@ -5,9 +5,9 @@
 
 
 ## Overview
-This project intends to make modding Bethesda games on Linux a reality for more users. It provides a set of scripts, which automatically configure a fully functional modding experience.
+This project intends to make modding Bethesda games on Linux a reality for every Linux user. It provides a set of scripts, which automatically configure a fully functional modding setup.
 
-**Note:** The only tested game at this time is Skyrim SE. I don't own the other games on PC.
+**Note:** The only verified game at this time is Skyrim SE. I don't own the other games on PC.
 
 ### Features
 - [x] Simple, GUI-driven installer.
@@ -17,6 +17,7 @@ This project intends to make modding Bethesda games on Linux a reality for more 
 - [x] Launching the game from Steam now launches Mod Organizer 2 instead
 - [x] NXM links from your browser can be sent to Mod Organizer 2
 - [x] DynDoLOD, FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected
+- [ ] Update function for all of the scripts and tools (coming soon)
 - [ ] Steam Deck support (unsure, as I don't own one)
 - [ ] Flatpak Steam support (experimental)
 
@@ -63,7 +64,7 @@ Installation is simple:
 ## Supported Games
 
 The following is a small overview of the current state of each supported game:<br>
-Note: Much of this data is carried over from [modorganizer2-linux-installer](https://github.com/rockerbacon/modorganizer2-linux-installer)
+Note: Much of this data is carried over from [modorganizer2-linux-installer](https://github.com/rockerbacon/modorganizer2-linux-installer), and may be outdated.
 
 | GAME                   | GAMEPLAY        | SCRIPT EXTENDER           | ENB           |
 | :--------------------- | :-------------- | :------------------------ | :------------ |
@@ -105,9 +106,9 @@ Here is what you need to do in order to update:
 
 ## Credits
 
-- [Rockerbacon](https://github.com/rockerbacon) - Creating the original scripts that this project was reworked from.
+- [Rockerbacon](https://github.com/rockerbacon) - For creating the original scripts that inspired this project.
 
-    Nearly everything has been rewritten, save for the contents of `gamesinfo/` and `handlers/`.
+    The main `setup` script was written from scratch, the contents of `handlers/` have been heavily reworked, and the contents of `gamesinfo/` are mostly untouched.
 
 
 ## License
