@@ -47,10 +47,13 @@ Installation is simple:
 
 ### Configuring Mod Organizer 2
 **On the first run of MO2:**
-- You should create a *Portable* instance.
-- MO2 will figure out the necessary paths automatically.
-- Don't forget to connect your Nexus account.
-- You will be asked whether MO2 should handle NXM links, you should choose *Yes*.
+- Choose *Create a portable instance*.
+- Choose the game that you're installing for.
+- Store the data in the default location, or anywhere else you like.
+- Connect your Nexus account (using an API key is suggested).
+- Click *Finish* to create the instance.
+- Choose either *Yes* or *No* when asked if you want tutorials.
+- Choose *Yes* when MO2 asks if you want it to handle NXM links.
 
 **Executable Paths:**
 - To regain access to the game's launcher, edit the executable path in MO2 by simply appending `.bak` to the filename.
