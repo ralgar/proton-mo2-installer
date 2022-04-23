@@ -1,0 +1,3 @@
+[submodule "proton-shunt"]
+	path = proton-shunt
+	url = git@github.com:ralgar/proton-shunt.git
