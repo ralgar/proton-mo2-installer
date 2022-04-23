@@ -10,14 +10,11 @@ This project intends to make modding Bethesda games on Linux a reality for every
 **Note:** The only verified game at this time is Skyrim SE. I don't own the other games on PC.
 
 ### Features
-- [x] Simple, GUI-driven installer.
-- [x] Installs Mod Organizer 2
-- [x] Installs LOOT
-- [x] Installs Script Extender
-- [x] Launching the game from Steam now launches Mod Organizer 2 instead
-- [x] NXM links from your browser can be sent to Mod Organizer 2
+- [x] Simple, GUI-driven installer. Installs, updates, and uninstalls cleanly.
+- [x] Installs Mod Organizer 2, LOOT, and Script Extender
+- [x] Launching the game from Steam now launches Mod Organizer 2 instead (see [Proton Shunt](https://github.com/ralgar/proton-shunt))
+- [x] NXM links from your browser can be sent directly to Mod Organizer 2
 - [x] DynDoLOD, FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected
-- [ ] Update function for all of the scripts and tools (coming soon)
 - [ ] Steam Deck support (unsure, as I don't own one)
 - [ ] Flatpak Steam support (experimental)
 
@@ -38,7 +35,7 @@ These dependencies should be available out-of-the-box on most systems:
 Installation is simple:
 1. Install your chosen game through Steam.
 2. Launch the game once to initialize the Proton prefix.
-3. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases), or simply `git clone` the repo.
+3. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
 4. Run `setup`, and follow the prompts until finished.
 5. Launch the game. It will now launch MO2 instead.
 
@@ -87,19 +84,12 @@ Please help to keep this table up to date by [opening issues](https://github.com
 ## Updating the tools
 
 Updating the tools probably isn't necessary at this point, since they are quite mature.<br>
-If you do feel the need, updating is a fairly simple process thanks to the included Uninstall function.
+If you do feel the need, updating is a painless process thanks to the installer's *Update* function.
 
 Here is what you need to do in order to update:
 
-1. Backup your game's Mod Organizer 2 instance (`~/.local/share/proton-mo2-installer/modorganizer2/<chosen-game>`)
-2. Run `setup`, following the prompts to *Uninstall*
-3. Run `setup` again, following the prompts to *Install*
-4. Copy the following files and directories from your backup to the fresh Mod Organizer 2 instance:
-  - `downloads` directory
-  - `mods` directory
-  - `overwrite` directory
-  - `ModOrganizer2.ini` file
-  - `nxmhandler.ini` file
+1. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
+2. Run `setup`, following the prompts to *Update*.
 
 
 ## Notes
