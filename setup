@@ -122,6 +122,14 @@ _dialog() {
                         --no-wrap --ellipsize \
                         --text '\nCould not locate Steam data!'
                     ;;
+                update_failed)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nUpdate failed!'
+                    ;;
             esac
             ;;
 
@@ -142,6 +150,14 @@ _dialog() {
                         --info --icon-name "dialog-info" \
                         --no-wrap --ellipsize \
                         --text '\nUninstallation complete!'
+                    ;;
+                update_success)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --info --icon-name "dialog-info" \
+                        --no-wrap --ellipsize \
+                        --text '\nUpdate completed successfully!'
                     ;;
             esac
             ;;
@@ -293,16 +309,22 @@ _install_loot() {
 
 _install_main() {
 
-    echo "# Installing Mod Organizer 2..." ; sleep 1
+    if [[ $update ]] ; then
+        local action="Updating"
+    else
+        local action="Installing"
+    fi
+
+    echo "# $action Mod Organizer 2..." ; sleep 1
     _install_mo2 || return 1
 
-    echo "# Installing LOOT..." ; sleep 1
+    echo "# $action LOOT..." ; sleep 1
     _install_loot || return 1
 
-    echo "# Installing Proton Shunt..." ; sleep 1
+    echo "# $action Proton Shunt..." ; sleep 1
     _install_proton_shunt || return 1
 
-    echo "# Installing script extender..." ; sleep 1
+    echo "# $action script extender..." ; sleep 1
     _install_script_extender || return 1
 
     #if [[ -n "$game_enb_url" ]] ; then
@@ -310,7 +332,7 @@ _install_main() {
     #    run _install_enb
     #fi
 
-    echo "# Installing Windows libraries..." ; sleep 1
+    echo "# Configuring the game's prefix..." ; sleep 1
     _install_verbs || return 1
 
     echo "# Finished!" ; sleep 1
@@ -338,21 +360,27 @@ _install_mo2() {
     if [[ ! -d "$share/applications" ]] ; then
         mkdir -p "$share/applications" || return 1
     fi
-    if [[ ! -f "$share/applications/nxm-handler.desktop" ]] ; then
+    if [[ ! -f "$share/applications/nxm-handler.desktop" || $update ]] ; then
         cp "$script_dir/handlers/nxm-handler.desktop" "$share/applications" || return 1
         _track_file "$share/applications/nxm-handler.desktop" || return 1
         xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
     fi
-    if [[ ! -f "$install_path/nxm-broker.sh" ]] ; then
+    if [[ ! -f "$install_path/nxm-broker.sh" || $update ]] ; then
         cp "$script_dir/handlers/nxm-broker.sh" "$install_path" || return 1
         chmod u+x "$install_path/nxm-broker.sh" || return 1
     fi
 
     # FNIS and Nemesis workarounds
-    mkdir -p "$game_data/Data/tools/GenerateFNIS_for_"{Modders,Users} || return 1
-    _track_file "$game_data/Data/tools" || return 1
-    mkdir -p "$game_data/Data/Nemesis_Engine" || return 1
-    _track_file "$game_data/Data/Nemesis_Engine" || return 1
+    for dir in GenerateFNIS_for_{Modders,Users} ; do
+        if [[ ! -d $dir ]] ; then
+            mkdir -p "$game_data/Data/tools/$dir" || return 1
+            _track_file "$game_data/Data/tools" || return 1
+        fi
+    done
+    if [[ ! -d "$game_data/Data/Nemesis_Engine" ]] ; then
+        mkdir -p "$game_data/Data/Nemesis_Engine" || return 1
+        _track_file "$game_data/Data/Nemesis_Engine" || return 1
+    fi
 }
 
 
@@ -362,20 +390,22 @@ _install_proton_shunt() {
     local version="$PROTON_SHUNT_VERSION"
 
     # Replace the main game executable with Proton Shunt
-    mv "${game_data:?}/$game_executable" \
-        "${game_data:?}/$game_executable.bak" || return 1
-    if [[ -f $script_dir/proton-shunt/proton-shunt.exe ]] ; then
-        cp "$script_dir/proton-shunt/proton-shunt.exe" \
+    if [[ ! $update ]] ; then
+        mv "${game_data:?}/$game_executable" \
+            "${game_data:?}/$game_executable.bak" || return 1
+    fi
+    if [[ -f $script_dir/proton-shunt/proton-shunt-v$version.exe ]] ; then
+        cp "$script_dir/proton-shunt/proton-shunt-v$version.exe" \
             "${game_data:?}/$game_executable" || return 1
     else
-        _download_file "$baseurl/v$version/proton-shunt.exe" || return 1
-        cp "$cache_dir/proton-shunt.exe" \
+        _download_file "$baseurl/v$version/proton-shunt-v$version.exe" || return 1
+        cp "$cache_dir/proton-shunt-v$version.exe" \
             "${game_data:?}/$game_executable" || return 1
     fi
 
     # Configure path to the Mod Organizer 2 executable
     echo "Z:$(sed 's/\//\\\\/g' <<< "$instance_path")\\ModOrganizer.exe" \
-        >> "${game_data:?}/proton-shunt.cfg" || return 1
+        > "${game_data:?}/proton-shunt.cfg" || return 1
     _track_file "${game_data:?}/proton-shunt.cfg" || return 1
 }
 
@@ -448,6 +478,7 @@ _main() {
     instance_path="$install_path/modorganizer2/$game_nexusid"
     _find_game_data || return 1
 
+    # Run the Installation / Update / Uninstallation
     _select_task || return 1
     case $chosen_task in
         "Install")
@@ -463,6 +494,21 @@ _main() {
             else
                 _uninstall
                 _dialog error installation_failed
+                return 1
+            fi ;;
+        "Update")
+            update=1
+            _install_main | zenity \
+                --title="$_project_name_formal" \
+                --progress \
+                --pulsate \
+                --auto-close \
+                --no-cancel \
+                --width 360 --height 180
+            if [[ ${PIPESTATUS[0]} -eq 0 && ${PIPESTATUS[1]} -eq 0 ]] ; then
+                _dialog info update_success
+            else
+                _dialog error update_failed
                 return 1
             fi ;;
         "Uninstall")
@@ -540,6 +586,7 @@ _select_task() {
             --hide-header \
             --width "480" \
             --height "360" \
+            FALSE "Update" \
             FALSE "Uninstall" \
         )" ; then
             return 1
