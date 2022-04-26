@@ -18,7 +18,7 @@ _project_name_formal="Proton MO2 Installer"
 
 MO2_VERSION="2.4.4"
 LOOT_VERSION="0.18.2"
-PROTON_SHUNT_VERSION="1.0.0"
+PROTON_SHUNT_VERSION="1.0.1"
 
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
 install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
