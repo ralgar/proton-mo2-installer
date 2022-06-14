@@ -360,14 +360,22 @@ _install_mo2() {
     if [[ ! -d "$share/applications" ]] ; then
         mkdir -p "$share/applications" || return 1
     fi
-    if [[ ! -f "$share/applications/nxm-handler.desktop" || $update ]] ; then
-        cp "$script_dir/handlers/nxm-handler.desktop" "$share/applications" || return 1
-        _track_file "$share/applications/nxm-handler.desktop" || return 1
-        xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
-    fi
-    if [[ ! -f "$install_path/nxm-broker.sh" || $update ]] ; then
+
+    cp "$script_dir/handlers/nxm-handler.desktop" "$share/applications" || return 1
+    _track_file "$share/applications/nxm-handler.desktop" || return 1
+    xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
+
+    if [[ $PATH =~ $HOME/.local/bin ]] ; then
+        if [[ ! -d "$HOME/.local/bin" ]] ; then
+            mkdir -p "$HOME/.local/bin" || return 1
+        fi
+        cp "$script_dir/handlers/nxm-broker.sh" "$HOME/.local/bin" || return 1
+        chmod u+x "$HOME/.local/bin/nxm-broker.sh" || return 1
+    else
         cp "$script_dir/handlers/nxm-broker.sh" "$install_path" || return 1
         chmod u+x "$install_path/nxm-broker.sh" || return 1
+        sed -i "s|nxm-broker.sh|$install_path/nxm-broker.sh|" \
+            "$share/applications/nxm-handler.desktop" || return 1
     fi
 
     # FNIS and Nemesis workarounds
@@ -377,6 +385,7 @@ _install_mo2() {
             _track_file "$game_data/Data/tools" || return 1
         fi
     done
+
     if [[ ! -d "$game_data/Data/Nemesis_Engine" ]] ; then
         mkdir -p "$game_data/Data/Nemesis_Engine" || return 1
         _track_file "$game_data/Data/Nemesis_Engine" || return 1
