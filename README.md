@@ -5,18 +5,20 @@
 
 
 ## Overview
-This project intends to make modding Bethesda games on Linux a reality for every Linux user. It provides a set of scripts, which automatically configure a fully functional modding setup.
+This project intends to make modding Bethesda games on Linux a reality for every Linux user. It provides a set of scripts, which automatically configure a fully functional instance of Mod Organizer 2.
 
-**Note:** The only verified game at this time is Skyrim SE. I don't own the other games on PC.
+There is also a detailed [Wiki](https://github.com/ralgar/proton-mo2-installer/wiki) (WIP) to document the installation and usage of other tools.
+
+**Note:** The only tested game at this time is Skyrim SE. I don't own the other games.
 
 ### Features
 - [x] Simple, GUI-driven installer. Installs, updates, and uninstalls cleanly.
-- [x] Installs Mod Organizer 2, LOOT, and Script Extender
-- [x] Launching the game from Steam now launches Mod Organizer 2 instead (see [Proton Shunt](https://github.com/ralgar/proton-shunt))
-- [x] NXM links from your browser can be sent directly to Mod Organizer 2
-- [x] DynDoLOD, FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected
-- [ ] Steam Deck support (unsure, as I don't own one)
-- [ ] Flatpak Steam support (experimental)
+- [x] Installs Mod Organizer 2, LOOT, and Script Extender.
+- [x] Launching the game from Steam now launches Mod Organizer 2 instead (see [Proton Shunt](https://github.com/ralgar/proton-shunt)).
+- [x] NXM links from your browser can be sent directly to Mod Organizer 2.
+- [x] FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected. DynDoLOD takes a bit of tweaking (see the [Wiki](https://github.com/ralgar/proton-mo2-installer/wiki) for details).
+- [ ] Steam Deck support (I don't own one, please let me know if it works or not).
+- [ ] Flatpak Steam support (experimental / coming soon).
 
 
 ## Getting Started
@@ -46,8 +48,8 @@ Installation is simple:
 **On the first run of MO2:**
 - Choose *Create a portable instance*.
 - Choose the game that you're installing for.
-- Store the data in the default location, or anywhere else you like.
-- Connect your Nexus account (using an API key is suggested).
+- Choose a location to store the instance data. I recommend choosing a *non-default* location.
+- Connect your Nexus account (using an API key is recommended).
 - Click *Finish* to create the instance.
 - Choose either *Yes* or *No* when asked if you want tutorials.
 - Choose *Yes* when MO2 asks if you want it to handle NXM links.
@@ -83,8 +85,7 @@ Please help to keep this table up to date by [opening issues](https://github.com
 
 ## Updating the tools
 
-Updating the tools probably isn't necessary at this point, since they are quite mature.<br>
-If you do feel the need, updating is a painless process thanks to the installer's *Update* function.
+Updating is a painless process thanks to the installer's *Update* function.
 
 Here is what you need to do in order to update:
 
