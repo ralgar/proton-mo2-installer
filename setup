@@ -17,7 +17,6 @@ _project_name="proton-mo2-installer"
 _project_name_formal="Proton MO2 Installer"
 
 MO2_VERSION="2.4.4"
-LOOT_VERSION="0.18.2"
 PROTON_SHUNT_VERSION="1.1.0"
 CUSTOM_PROTON_VERSION="Proton-6.17-STL-1"
 
@@ -357,22 +356,6 @@ _install_custom_proton() {
 #}
 
 
-# Install LOOT globally, while checking for existing installation
-_install_loot() {
-
-    local url="https://github.com/loot/loot/releases/download/$LOOT_VERSION/loot_$LOOT_VERSION-win64.7z"
-    local archive="${url##*/}"
-
-    _download_file "$url" || return 1
-
-    if [[ ! -d "$install_path/tools/loot" ]] ; then
-        mkdir -p "$install_path/tools/loot" || return 1
-    fi
-
-    bsdtar -C "$install_path/tools/loot" --strip-components 1 -xf "$cache_dir/$archive" || return 1
-}
-
-
 _install_main() {
 
     if [[ $update ]] ; then
@@ -383,9 +366,6 @@ _install_main() {
 
     echo "# $action Mod Organizer 2..." ; sleep 1
     _install_mo2 || return 1
-
-    echo "# $action LOOT..." ; sleep 1
-    _install_loot || return 1
 
     echo "# $action Proton Shunt..." ; sleep 1
     _install_proton_shunt || return 1
@@ -683,7 +663,6 @@ _select_task() {
 #        --column "Checklist" --column "Tools" \
 #        --hide-header \
 #        FALSE "ENB" \
-#        FALSE "LOOT" \
 #    )"
 #
 #    IFS='|' read -ra tools_array <<< "$chosen_tools"

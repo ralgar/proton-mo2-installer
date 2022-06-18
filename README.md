@@ -57,11 +57,12 @@ Installation is simple:
 
 **Executable Paths:**
 - To regain access to the game's launcher, edit the executable path in MO2 by simply appending `.bak` to the filename.
-- To add LOOT as an executable, the path is `Z:\home\my_user\.local\share\proton-mo2-installer\tools\loot\LOOT.exe`. LOOT is also included in MO2 by default, just hit the *Sort* button in the *Plugins* tab.
 
 **Installing Additional Modding Tools:**
-1. Install the tool as a mod, using MO2.
+1. Many tools can be installed as mods using MO2.
 2. Under the `Data` tab, find the executable, right click it, and choose `Add as Executable`.
+
+**Note:** LOOT is included in MO2, just press the *Sort* button under the *Plugins* tab.
 
 
 ## Supported Games
