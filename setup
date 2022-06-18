@@ -18,7 +18,8 @@ _project_name_formal="Proton MO2 Installer"
 
 MO2_VERSION="2.4.4"
 LOOT_VERSION="0.18.2"
-PROTON_SHUNT_VERSION="1.0.1"
+PROTON_SHUNT_VERSION="1.1.0"
+CUSTOM_PROTON_VERSION="Proton-6.17-STL-1"
 
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
 install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
@@ -122,6 +123,14 @@ _dialog() {
                         --no-wrap --ellipsize \
                         --text '\nCould not locate Steam data!'
                     ;;
+                no_steam_config)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nCould not locate Steam config file!'
+                    ;;
                 update_failed)
                     zenity \
                         --title="$_project_name_formal" \
@@ -158,19 +167,6 @@ _dialog() {
                         --info --icon-name "dialog-info" \
                         --no-wrap --ellipsize \
                         --text '\nUpdate completed successfully!'
-                    ;;
-            esac
-            ;;
-
-        warn)
-            case $2 in
-                no_game_prefix)
-                    zenity \
-                        --title="$_project_name_formal" \
-                        --width "$width" --height "$height" \
-                        --error --icon-name "dialog-error" \
-                        --no-wrap --ellipsize \
-                        --text '\nCould not locate the game prefix!'
                     ;;
             esac
             ;;
@@ -241,13 +237,6 @@ _find_game_data() {
         return 1
     fi
 
-    # Return failure if no prefix is found
-    if [[ ! -d "$game_library/compatdata/$game_appid" ]] ; then
-        printf "\nWARNING: The prefix is missing. Run the game first, and try again.\n\n"
-        _dialog warn no_game_prefix
-        return 1
-    fi
-
     # Return success if game data is found in library
     if [[ -d "$game_library/common/$game_steam_subdirectory" ]] ; then
         printf "INFO: Found game in library: %s\n" "$library"
@@ -261,6 +250,83 @@ _find_game_data() {
     return 1
 }
 
+
+_install_custom_proton() {
+
+    local base_url="https://github.com/ralgar/proton-builds/releases/download"
+    local archive="${url##*/}"
+    local steam_root
+    local compat_tools
+    local current_tool
+    local game_prefix="$game_library/compatdata/$game_appid"
+
+    _download_file "${base_url}/$CUSTOM_PROTON_VERSION/$CUSTOM_PROTON_VERSION.tar.gz"
+
+    # Find the Steam global config and root directory
+    # NOTE: `find` does not provide a useful return code, so
+    #   we must use other logic to determine success
+    steam_conf="$(\
+        find "$HOME" \
+        -name config.vdf \
+        -print -quit \
+        2> /dev/null \
+    )"
+    if [[ ! -f $steam_conf ]] ; then
+        _dialog error no_steam_config
+        return 1
+    fi
+
+    # Try to determine the Steam root directory
+    steam_root="$(dirname "$steam_conf")"
+    steam_root="${steam_root%/*}"
+    if [[ ! -d $steam_root || ${steam_root##*/} != "Steam" ]] ; then
+        return 1
+    fi
+
+    # Create compatibilitytools.d if it doesn't exists
+    compat_tools="$steam_root/compatibilitytools.d"
+    if [[ ! -d $compat_tools ]] ; then
+        mkdir "$compat_tools"
+    fi
+
+    # Extract the custom Proton
+    if [[ ! -d $compat_tools/$CUSTOM_PROTON_VERSION ]] ; then
+        if bsdtar -C "$compat_tools" -xf "$cache_dir/$CUSTOM_PROTON_VERSION.tar.gz" ; then
+            _track_file "$compat_tools/$CUSTOM_PROTON_VERSION"
+        else
+            return 1
+        fi
+    fi
+
+    # Remap the game's compatibility tool
+    current_tool="$("$script_dir/utils/compat-tool-remap.py" \
+        -a "$game_appid" -c "$steam_conf" -l current)"
+    if [[ $current_tool != "$CUSTOM_PROTON_VERSION" ]] ; then
+        # Backup and remove the original game prefix if present
+        # Return failure if no prefix is found
+        if [[ -d $game_prefix ]] ; then
+            mv "$game_prefix" "$game_prefix.bak.$(date +%s)" || return 1
+        fi
+
+        # Remap the compat tool
+        if ! "$script_dir/utils/compat-tool-remap.py" \
+            -a "$game_appid" -c "$steam_conf" -t "$CUSTOM_PROTON_VERSION"
+        then
+            return 1
+        fi
+    else
+        echo "skipping compat remap"
+    fi
+
+    # Initialize a new game prefix with custom Proton
+    if [[ ! -d $game_prefix ]] ; then
+        touch "$game_data/proton-shunt.lock" || return 1
+        steam -silent -applaunch "$game_appid" --init-prefix &>/dev/null &
+        while [[ -f $game_data/proton-shunt.lock ]] ; do
+            sleep 1
+        done
+    fi
+}
 
 #_install_enb() {
 #
@@ -331,6 +397,9 @@ _install_main() {
     #    desc="Install ENB"
     #    run _install_enb
     #fi
+
+    echo "# Installing custom Proton..." ; sleep 1
+    _install_custom_proton || return 1
 
     echo "# Configuring the game's prefix..." ; sleep 1
     _install_verbs || return 1
@@ -455,7 +524,9 @@ _install_verbs() {
     if which protontricks &> /dev/null ; then
         if [[ -n "$game_protontricks" ]] ; then
             for verb in "${game_protontricks[@]}" ; do
-                if ! protontricks "$game_appid" -q "$verb" ; then
+                if ! PROTON_VERSION="$CUSTOM_PROTON_VERSION" \
+                    protontricks "$game_appid" -q "$verb"
+                then
                     return 1
                 fi
             done

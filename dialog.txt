@@ -3,9 +3,9 @@
 ======================================
 
 Instructions:
-    1. Install your game through Steam
-    2. Run the game at least once to initialize the prefix
-    3. Check the box below and follow the prompts until finished
+    1. Install your game through Steam.
+    2. Make sure Steam is NOT running before starting the installer.
+    3. Check the box below, and follow the prompts until finished.
     4. Launch the game from Steam. It will now launch MO2 instead.
 
 Note: Configuring the prefix can take a long time in some cases. Please be patient, the process will finish eventually.

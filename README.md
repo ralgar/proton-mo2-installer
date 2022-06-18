@@ -14,6 +14,7 @@ There is also a detailed [Wiki](https://github.com/ralgar/proton-mo2-installer/w
 ### Features
 - [x] Simple, GUI-driven installer. Installs, updates, and uninstalls cleanly.
 - [x] Installs Mod Organizer 2, LOOT, and Script Extender.
+- [x] Installs custom Proton version required for Mod Organzer 2.
 - [x] Launching the game from Steam now launches Mod Organizer 2 instead (see [Proton Shunt](https://github.com/ralgar/proton-shunt)).
 - [x] NXM links from your browser can be sent directly to Mod Organizer 2.
 - [x] FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected. DynDoLOD takes a bit of tweaking (see the [Wiki](https://github.com/ralgar/proton-mo2-installer/wiki) for details).
@@ -36,19 +37,19 @@ These dependencies should be available out-of-the-box on most systems:
 ### Installation
 Installation is simple:
 1. Install your chosen game through Steam.
-2. Launch the game once to initialize the Proton prefix.
-3. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
+2. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
+3. Make sure Steam is *not* running before starting the installer..
 4. Run `setup`, and follow the prompts until finished.
-5. Launch the game. It will now launch MO2 instead.
+5. Launch the game via Steam. It will now launch MO2 instead.
 
-**Note:** Installing the Windows packages can take a long time in some cases. There is no fix for this, just be patient.
+**Note:** Configuring the prefix can take a long time in some cases. There is no fix for this, just be patient.
 
 
 ### Configuring Mod Organizer 2
 **On the first run of MO2:**
 - Choose *Create a portable instance*.
 - Choose the game that you're installing for.
-- Choose a location to store the instance data. I recommend choosing a *non-default* location.
+- Choose a location to store the instance data. I recommend choosing a *non-default* location, see [Notes](#notes).
 - Connect your Nexus account (using an API key is recommended).
 - Click *Finish* to create the instance.
 - Choose either *Yes* or *No* when asked if you want tutorials.
@@ -56,7 +57,7 @@ Installation is simple:
 
 **Executable Paths:**
 - To regain access to the game's launcher, edit the executable path in MO2 by simply appending `.bak` to the filename.
-- To add LOOT as an executable, the path is `Z:\home\my_user\.local\share\proton-mo2-installer\tools\loot\LOOT.exe`.
+- To add LOOT as an executable, the path is `Z:\home\my_user\.local\share\proton-mo2-installer\tools\loot\LOOT.exe`. LOOT is also included in MO2 by default, just hit the *Sort* button in the *Plugins* tab.
 
 **Installing Additional Modding Tools:**
 1. Install the tool as a mod, using MO2.
@@ -90,19 +91,21 @@ Updating is a painless process thanks to the installer's *Update* function.
 Here is what you need to do in order to update:
 
 1. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
-2. Run `setup`, following the prompts to *Update*.
+2. Make sure Steam is *not* running before starting the installer.
+3. Run `setup`, following the prompts to *Update*.
 
 
 ## Notes
 
 - There is no Vortex support, and there probably never will be. In my experience, it simply isn't capable of handling heavy mod stacks nearly as well as Mod Organizer 2 is.
+- The included *Uninstall* function will wipe out your Mod Organizer 2 instance if you store it in the default location. This includes all of your downloaded and installed mods.
 
 
 ## Credits
 
-- [Rockerbacon](https://github.com/rockerbacon) - For creating the original scripts that inspired this project.
-
+- [Rockerbacon](https://github.com/rockerbacon) - For creating the original Lutris scripts that inspired this project.<br>
     The main `setup` script was written from scratch, the contents of `handlers/` have been heavily reworked, and the contents of `gamesinfo/` are mostly untouched.
+- [Frostworx](https://github.com/frostworx) - For building the custom Proton required for Mod Organizer 2.
 
 
 ## License
