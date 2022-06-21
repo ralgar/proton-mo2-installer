@@ -271,28 +271,27 @@ _install_custom_proton() {
         2> /dev/null \
     )"
     if [[ ! -f $steam_conf ]] ; then
+        printf "Could not locate config.vdf!\n"
         _dialog error no_steam_config
         return 1
     fi
 
-    # Try to determine the Steam root directory
+    # Determine the Steam root directory
     steam_root="$(dirname "$steam_conf")"
-    steam_root="${steam_root%/*}"
-    if [[ ! -d $steam_root || ${steam_root##*/} != "Steam" ]] ; then
-        return 1
-    fi
+    steam_root="$(dirname "$steam_root")"
 
     # Create compatibilitytools.d if it doesn't exists
     compat_tools="$steam_root/compatibilitytools.d"
     if [[ ! -d $compat_tools ]] ; then
-        mkdir "$compat_tools"
+        mkdir "$compat_tools" || return 1
     fi
 
     # Extract the custom Proton
     if [[ ! -d $compat_tools/$CUSTOM_PROTON_VERSION ]] ; then
         if bsdtar -C "$compat_tools" -xf "$cache_dir/$CUSTOM_PROTON_VERSION.tar.gz" ; then
-            _track_file "$compat_tools/$CUSTOM_PROTON_VERSION"
+            _track_file "$compat_tools/$CUSTOM_PROTON_VERSION" || return 1
         else
+            printf "Failed to extract compatbility tool!\n"
             return 1
         fi
     fi
@@ -314,7 +313,7 @@ _install_custom_proton() {
             return 1
         fi
     else
-        echo "skipping compat remap"
+        printf "Skipping compatbility tool remap.\n"
     fi
 
     # Initialize a new game prefix with custom Proton
