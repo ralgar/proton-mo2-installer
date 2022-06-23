@@ -13,7 +13,7 @@ There is also a detailed [Wiki](https://github.com/ralgar/proton-mo2-installer/w
 
 ### Features
 - [x] Simple, GUI-driven installer. Installs, updates, and uninstalls cleanly.
-- [x] Installs Mod Organizer 2, LOOT, and Script Extender.
+- [x] Installs Mod Organizer 2 with integrated LOOT, and Script Extender.
 - [x] Installs custom Proton version required for Mod Organzer 2.
 - [x] Launching the game from Steam now launches Mod Organizer 2 instead (see [Proton Shunt](https://github.com/ralgar/proton-shunt)).
 - [x] NXM links from your browser can be sent directly to Mod Organizer 2.
@@ -38,11 +38,12 @@ These dependencies should be available out-of-the-box on most systems:
 Installation is simple:
 1. Install your chosen game through Steam.
 2. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
-3. Make sure Steam is *not* running before starting the installer..
-4. Run `setup`, and follow the prompts until finished.
-5. Launch the game via Steam. It will now launch MO2 instead.
+3. Run `setup`, and follow the prompts until finished.
+4. Launch the game via Steam. It will now launch MO2 instead.
 
-**Note:** Configuring the prefix can take a long time in some cases. There is no fix for this, just be patient.
+**Notes:**
+- The installer may interact with Steam in various ways, this may include closing running Steam instances, and launching the game to inititalize the prefix. Do NOT interfere with this process or the installation will fail to complete.
+- Configuring the prefix can take a *long* time in some cases. There is no fix for this, just be patient.
 
 
 ### Configuring Mod Organizer 2
@@ -96,10 +97,11 @@ Here is what you need to do in order to update:
 3. Run `setup`, following the prompts to *Update*.
 
 
-## Notes
+## Uninstalling
 
-- There is no Vortex support, and there probably never will be. In my experience, it simply isn't capable of handling heavy mod stacks nearly as well as Mod Organizer 2 is.
-- The included *Uninstall* function will wipe out your Mod Organizer 2 instance if you store it in the default location. This includes all of your downloaded and installed mods.
+Uninstalling is simple, just run `setup`, and follow the prompts to uninstall.
+
+**Note:** The uninstaller will *never* remove the `~/.local/share/proton-mo2-installer` directory. Because this is the default location for MO2 instances, some users may have mods stored in this location. To prevent any accidental data loss, it is up to you to remove this directory manually.
 
 
 ## Credits

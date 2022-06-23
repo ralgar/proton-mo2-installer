@@ -130,6 +130,14 @@ _dialog() {
                         --no-wrap --ellipsize \
                         --text '\nCould not locate Steam config file!'
                     ;;
+                no_steam_kill)
+                    zenity \
+                        --title="$_project_name_formal" \
+                        --width "$width" --height "$height" \
+                        --error --icon-name "dialog-error" \
+                        --no-wrap --ellipsize \
+                        --text '\nCould not kill Steam process!'
+                    ;;
                 update_failed)
                     zenity \
                         --title="$_project_name_formal" \
@@ -253,7 +261,6 @@ _find_game_data() {
 _install_custom_proton() {
 
     local base_url="https://github.com/ralgar/proton-builds/releases/download"
-    local archive="${url##*/}"
     local steam_root
     local compat_tools
     local current_tool
@@ -392,10 +399,12 @@ _install_mo2() {
 
     local url="https://github.com/ModOrganizer2/modorganizer/releases/download/v$MO2_VERSION/Mod.Organizer-$MO2_VERSION.7z"
 
+    # Remove a previous tracked file to prevent potential data loss
+    sed -i "\|$instance_path|d" "$instance_path/tracked_files.txt"
+
     _download_file "$url" || return 1
 
     mkdir -p "$instance_path" || return 1
-    _track_file "$instance_path" || return 1
 
     bsdtar -C "$instance_path" -xf "$cache_dir/${url##*/}" || return 1
 
@@ -516,6 +525,17 @@ _install_verbs() {
 }
 
 
+_kill_steam() {
+
+    if pgrep steam &> /dev/null ; then
+        if ! timeout 90 killall -w steam ; then
+            _dialog error no_steam_kill
+            return 1
+        fi
+    fi
+}
+
+
 _main() {
 
     _check_dependencies || return 1
@@ -526,7 +546,7 @@ _main() {
         --width 720 --height 540 \
         --text-info \
         --filename "$script_dir/dialog.txt" \
-        --checkbox "I'm ready to continue"
+        --checkbox "I've read this, and I'm ready to continue."
     then
         return 1
     fi
@@ -541,6 +561,7 @@ _main() {
     _select_task || return 1
     case $chosen_task in
         "Install")
+            _kill_steam || return 1
             _install_main | zenity \
                 --title="$_project_name_formal" \
                 --progress \
@@ -557,6 +578,7 @@ _main() {
             fi ;;
         "Update")
             update=1
+            _kill_steam || return 1
             _install_main | zenity \
                 --title="$_project_name_formal" \
                 --progress \
@@ -689,37 +711,21 @@ _track_file() {
 _uninstall() {
 
     local file
-    local remaining_instances
     local remove
 
     # Load tracked files for the game instance
     if [[ -f "$instance_path/tracked_files.txt" ]] ; then
         readarray -t remove < "$instance_path/tracked_files.txt"
-        remove+=( "$install_path" )
     else
         printf "\nNothing to uninstall...\n"
         return 1
     fi
 
-    # Check for any other game instances before removing everything
-    if [[ $(find "$install_path/modorganizer2" -mindepth 1 -maxdepth 1 -type d | wc -l) -gt 1 ]] ; then
-        remaining_instances=true
-    fi
-
     # Remove the tracked files
     for file in "${remove[@]}" ; do
-        if [[ "$file" =~ ${_project_name}$|nxm-handler ]] ; then
-            if [[ ( -e "$file" || -L "$file" ) && "$remaining_instances" != true ]] ; then
-                rm -rf "$file" || return 1
-                printf "Removed:  %s\n" "$file"
-            else
-                printf "Skipped:  %s\n" "$file"
-            fi
-        else
-            if [[ -e "$file" || -L "$file" ]] ; then
-                rm -rf "$file" || return 1
-                printf "Removed:  %s\n" "$file"
-            fi
+        if [[ -e "$file" || -L "$file" ]] ; then
+            rm -rf "$file" || return 1
+            printf "Removed:  %s\n" "$file"
         fi
     done
 
@@ -730,9 +736,7 @@ _uninstall() {
         printf "Restored: %s\n" "${file%.bak}"
     done
 
-    if [[ "$remaining_instances" = true ]] ; then
-        printf "\nInstances were detected for other games, some files were not removed.\n"
-    fi
+    printf "\n%s was not removed, in order to prevent accidental data loss.\n" "$install_path"
     printf "\nUninstall completed!\n"
 }
 
