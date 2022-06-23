@@ -50,7 +50,7 @@ Installation is simple:
 **On the first run of MO2:**
 - Choose *Create a portable instance*.
 - Choose the game that you're installing for.
-- Choose a location to store the instance data. I recommend choosing a *non-default* location, see [Notes](#notes).
+- Store your instance data in the default location, or anywhere else you like.
 - Connect your Nexus account (using an API key is recommended).
 - Click *Finish* to create the instance.
 - Choose either *Yes* or *No* when asked if you want tutorials.
