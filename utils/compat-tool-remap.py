@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''
 Changes a compatibility tool mapping in Steam's config.vdf.
 '''
