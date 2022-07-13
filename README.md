@@ -5,21 +5,22 @@
 
 
 ## Overview
-This project intends to make modding Bethesda games on Linux a reality for every Linux user. It provides a set of scripts, which automatically configure a fully functional instance of Mod Organizer 2.
+This project intends to make modding Bethesda games a reality for every Linux user. It provides a set of scripts, which automatically configure a fully functional instance of Mod Organizer 2.
 
-There is also a detailed [Wiki](https://github.com/ralgar/proton-mo2-installer/wiki) (WIP) to document the installation and usage of other tools.
+There is also a [wiki](https://github.com/ralgar/proton-mo2-installer/wiki) to document the installation and usage of other tools.
 
 **Note:** The only tested game at this time is Skyrim SE. I don't own the other games.
 
 ### Features
 - [x] Simple, GUI-driven installer. Installs, updates, and uninstalls cleanly.
-- [x] Installs Mod Organizer 2 with integrated LOOT, and Script Extender.
+- [x] Installs Mod Organizer 2 with integrated LOOT.
+- [x] Installs the Script Extender for the chosen game.
 - [x] Installs custom Proton version required for Mod Organzer 2.
-- [x] Launching the game from Steam now launches Mod Organizer 2 instead (see [Proton Shunt](https://github.com/ralgar/proton-shunt)).
+- [x] Launching the game from Steam now launches Mod Organizer 2 instead (uses [Proton Shunt](https://github.com/ralgar/proton-shunt)).
 - [x] NXM links from your browser can be sent directly to Mod Organizer 2.
-- [x] FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected. DynDoLOD takes a bit of tweaking (see the [Wiki](https://github.com/ralgar/proton-mo2-installer/wiki) for details).
-- [ ] Steam Deck support (I don't own one, please let me know if it works or not).
-- [ ] Flatpak Steam support (experimental / coming soon).
+- [x] DynDOLOD, FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected. See the [wiki](https://github.com/ralgar/proton-mo2-installer/wiki) for details.
+- [ ] Steam Deck support - I don't own one, but I *think* it should work. Please [open an issue](https://github.com/ralgar/proton-mo2-installer/issues) if it doesn't.
+- [ ] Flatpak Steam support - Not currently planned. May come later if enough people want it.
 
 
 ## Getting Started
@@ -60,8 +61,7 @@ Installation is simple:
 - To regain access to the game's launcher, edit the executable path in MO2 by simply appending `.bak` to the filename.
 
 **Installing Additional Modding Tools:**
-1. Many tools can be installed as mods using MO2.
-2. Under the `Data` tab, find the executable, right click it, and choose `Add as Executable`.
+See the [wiki](https://github.com/ralgar/proton-mo2-installer/wiki).
 
 **Note:** LOOT is included in MO2, just press the *Sort* button under the *Plugins* tab.
 
@@ -108,7 +108,7 @@ Uninstalling is simple, just run `setup`, and follow the prompts to uninstall.
 
 - [Rockerbacon](https://github.com/rockerbacon) - For creating the original Lutris scripts that inspired this project.<br>
     The main `setup` script was written from scratch, the contents of `handlers/` have been heavily reworked, and the contents of `gamesinfo/` are mostly untouched.
-- [Frostworx](https://github.com/frostworx) - For building the custom Proton required for Mod Organizer 2.
+- [Frostworx](https://github.com/frostworx) - For building the custom version of Proton, required to run Mod Organizer 2 smoothly.
 
 
 ## License
