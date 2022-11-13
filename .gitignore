@@ -1,1 +1,5 @@
-venv/
+# Exclude python cache dirs
+__pycache__/
+
+# Exclude 'python' dir (unneeded dev/testing files)
+python/
