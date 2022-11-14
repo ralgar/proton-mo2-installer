@@ -17,8 +17,9 @@ def main():
 
     steam_root = tui.select_steam_root()
     game = tui.select_game(steam_root)
+    task = tui.select_task()
 
-    print(game)
+    print(game.name, task)
 
 
 if __name__ == "__main__":

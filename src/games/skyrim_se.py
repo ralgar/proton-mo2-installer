@@ -1,5 +1,5 @@
 '''
-This module provides an object for Skyrim SE.
+This module provides an object class for Skyrim SE.
 '''
 
 class SkyrimSE:

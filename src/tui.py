@@ -81,3 +81,24 @@ class Tui:
 
         # Return an instantiated game object
         return games[appid]['init']
+
+
+    def select_task(self):
+        '''
+        Prompts the user to select between Install, Uninstall, and
+        Upgrade. Returns the name of the chosen task as a string.
+        '''
+
+        self.init_screen()
+
+        tasks = [
+            "Install",
+            "Uninstall",
+            "Upgrade"
+        ]
+
+        for pos, task in enumerate(tasks):
+            print(str(pos+1) + ":", task)
+        answer = int(input("\nChoose a task: ")) - 1
+
+        return tasks[answer]
