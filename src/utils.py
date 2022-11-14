@@ -6,6 +6,8 @@ import logging
 import os
 import requests
 
+import libarchive
+
 
 def download_file(dest_dir, url):
     '''
@@ -34,26 +36,35 @@ def download_file(dest_dir, url):
 
 def extract_archive(game, dest, archive, strip_leading=0):
     '''
-    Extracts an archive.
+    Extracts an archive to a destination directory. Optionally strips
+    (int) leading directories, for archives with a nested structure.
     '''
 
-    logging.info(game)
-
+    # Ensure dest exists
     if not os.path.isdir(dest):
         os.makedirs(dest, 0o755)
     track_file(game, dest)
 
-    command = "bsdtar -C " + dest
-    command = command + " --strip-components " + str(strip_leading)
-    command = command + " -xvf " + archive
+    with libarchive.file_reader(archive) as a:
+        os.chdir(dest)
+        for entry in a:
 
-    os.system(command)
-    # track_file(game, extracted_file)
+            # Strip i leading directories, and skip empty indexes
+            skip = False
+            for i in range(strip_leading):
+                entry.pathname = "/".join(entry.pathname.split('/')[1:])
+                if len(entry.pathname) == 0:
+                    skip = True
+            if skip is True:
+                continue
+
+            libarchive.extract.extract_entries([entry])
+            track_file(game, os.path.join(dest, entry.pathname))
 
 
 def track_file(game, file):
     '''
-    Adds the file/dir to the database list, for uninstalling.
+    Adds a file/dir to the database list, ignoring duplicate entries.
     '''
 
     database = os.path.join(game.mo2_dir, "tracked.db")
@@ -62,7 +73,6 @@ def track_file(game, file):
     with open(database, 'a+', encoding='UTF-8') as fp:
         fp.seek(0)
         for line in fp.readlines():
-            print(line)
             if line.strip() == file:
                 unique = False
 
