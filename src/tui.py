@@ -37,10 +37,7 @@ class Tui:
         self.init_screen()
         print("Installing...\n")
 
-        cache_dir = os.getenv('HOME') + '/.cache/proton-mo2-installer'
-        data_dir  = os.getenv('HOME') + '/.local/share/proton-mo2-installer'
-
-        mo2.install(cache_dir, data_dir, game)
+        mo2.install(game)
 
 
     def select_steam_root(self):
