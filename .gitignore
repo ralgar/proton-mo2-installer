@@ -3,3 +3,6 @@ __pycache__/
 
 # Exclude 'python' dir (unneeded dev/testing files)
 python/
+
+# Exclude log files
+*.log

@@ -5,6 +5,7 @@ This module contains the TUI object and methods.
 import logging
 import os
 
+import mo2
 import steam
 from games import games
 
@@ -26,6 +27,20 @@ class Tui:
 
         os.system('clear')
         print("\n\033[1;4mWelcome to Proton MO2 Installer v2!\033[0m\n\n")
+
+
+    def install_tools(self):
+        '''
+        Installs the modding tools, and provides TUI updates on the process.
+        '''
+
+        self.init_screen()
+        print("Installing...\n")
+
+        cache_dir = os.getenv('HOME') + '/.cache/proton-mo2-installer'
+        data_dir  = os.getenv('HOME') + '/.local/share/proton-mo2-installer'
+
+        mo2.install(cache_dir, data_dir)
 
 
     def select_steam_root(self):
