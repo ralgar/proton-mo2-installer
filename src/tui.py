@@ -2,26 +2,39 @@
 This module contains the TUI object and methods.
 '''
 
+import logging
 import os
 
 import steam
+from games import games
 
 
 class Tui:
     '''
-    TUI object.
+    Terminal User Interface (TUI) object.
     '''
 
     def __init__(self):
 
-        print("\n\033[1;4mWelcome to Proton MO2 Installer v2!\033[0m\n")
+        self.init_screen()
 
 
-    def select_steam_root(self, search_path):
+    def init_screen(self):
+        '''
+        Clears and (re)initializes the screen.
+        '''
+
+        os.system('clear')
+        print("\n\033[1;4mWelcome to Proton MO2 Installer v2!\033[0m\n\n")
+
+
+    def select_steam_root(self):
         '''
         Searches for Steam root candidates and, if there are more
         than one, asks the user to choose from them.
         '''
+
+        self.init_screen()
 
         candidates = steam.find_root(os.getenv('HOME'))
         if len(candidates) == 1:
@@ -33,9 +46,38 @@ class Tui:
         else:
             return False
 
-        return candidates[answer][:-18]
+        steam_root = candidates[answer][:-18]
+
+        return steam_root
 
 
-    def placeholder(self):
+    def select_game(self, steam_root):
+        '''
+        Scans for games which are both supported and installed, and
+        asks the user to choose from them.
+        '''
 
-        return
+        self.init_screen()
+
+        steam_apps = steam.list_appids(steam_root)
+
+        # Make a list of supported AppIDs
+        supported_apps = []
+        for app in games:
+            supported_apps.append(app)
+
+        # Build a list of matching AppIDs
+        matches = []
+        for supported_app in supported_apps:
+            for steam_app in steam_apps:
+                if supported_app == steam_app:
+                    matches.append(supported_app)
+
+        # Have user select their chosen game
+        for pos, match in enumerate(matches):
+            print(str(pos+1) + ":", games[match]['name'])
+        answer = int(input("\nChoose a game: ")) - 1
+        appid = matches[answer-1]
+
+        # Return an instantiated game object
+        return games[appid]['init']

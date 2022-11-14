@@ -4,9 +4,8 @@
 Main module
 '''
 
-import os
 
-import tui
+from tui import Tui
 
 
 def main():
@@ -14,11 +13,12 @@ def main():
     Main function.
     '''
 
-    ui = tui.Tui()
+    tui = Tui()
 
-    steam_root = ui.select_steam_root(os.getenv('HOME'))
+    steam_root = tui.select_steam_root()
+    game = tui.select_game(steam_root)
 
-    print(steam_root)
+    print(game)
 
 
 if __name__ == "__main__":
