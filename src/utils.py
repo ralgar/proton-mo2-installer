@@ -28,3 +28,20 @@ def download_file(dest_dir, url):
         logging.info("Finished downloading file: %s", filename)
     else:
         logging.info("File already present: %s", filename)
+
+    return full_path
+
+
+def extract_archive(dest_dir, archive, strip_leading=0):
+    '''
+    Extracts an archive.
+    '''
+
+    if not os.path.isdir(dest_dir):
+        os.makedirs(dest_dir, 0o755)
+
+    command = "bsdtar -C " + dest_dir
+    command = command + " --strip-components " + str(strip_leading)
+    command = command + " -xvf " + archive
+
+    os.system(command)

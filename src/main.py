@@ -29,11 +29,11 @@ def main():
     task = tui.select_task()
 
     if task == "Install":
-        tui.install_tools()
+        tui.install_tools(game)
     elif task == "Uninstall":
-        tui.install_tools()
+        tui.install_tools(game)
     elif task == "Upgrade":
-        tui.install_tools()
+        tui.install_tools(game)
 
 
 if __name__ == "__main__":

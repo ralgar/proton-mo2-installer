@@ -29,7 +29,7 @@ class Tui:
         print("\n\033[1;4mWelcome to Proton MO2 Installer v2!\033[0m\n\n")
 
 
-    def install_tools(self):
+    def install_tools(self, game):
         '''
         Installs the modding tools, and provides TUI updates on the process.
         '''
@@ -40,7 +40,7 @@ class Tui:
         cache_dir = os.getenv('HOME') + '/.cache/proton-mo2-installer'
         data_dir  = os.getenv('HOME') + '/.local/share/proton-mo2-installer'
 
-        mo2.install(cache_dir, data_dir)
+        mo2.install(cache_dir, data_dir, game)
 
 
     def select_steam_root(self):
