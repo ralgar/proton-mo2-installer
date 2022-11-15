@@ -5,6 +5,7 @@ This module contains utility functions.
 import logging
 import os
 import requests
+import sys
 
 import libarchive
 
@@ -63,6 +64,31 @@ def extract_archive(game, dest, archive, strip_leading=0):
             track_file(game, os.path.join(dest, entry.pathname))
 
         os.chdir(cwd)
+
+
+def get_paths():
+    '''
+    Discovers local paths (XDG Dirs, user PATH, etc.)
+    '''
+
+    if os.getenv('XDG_CACHE_HOME'):
+        cache_home = os.getenv('XDG_CACHE_HOME')
+    else:
+        cache_home = os.path.join(os.getenv('HOME'), '.cache')
+    cache_dir = os.path.join(cache_home, "proton-mo2-installer")
+
+    if os.getenv('XDG_DATA_HOME'):
+        data_home = os.getenv('XDG_DATA_HOME')
+    else:
+        data_home = os.path.join(os.getenv('HOME'), '.local/share')
+    data_dir = os.path.join(data_home, "proton-mo2-installer")
+
+    bin_dir = os.path.join(os.getenv('HOME'), '.local/bin')
+    if bin_dir not in os.getenv('PATH'):
+        logging.critical('Could not find %s in PATH.', bin_dir)
+        sys.exit(1)
+
+    return [ bin_dir, cache_home, cache_dir, data_dir, data_home ]
 
 
 def track_file(game, file):
