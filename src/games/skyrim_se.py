@@ -8,14 +8,16 @@ import utils
 
 class SkyrimSE:
 
-    def __init__(self):
+    def __init__(self, library_root, subdirectory):
 
         self.app_id       = 489830
         self.executable   = "SkyrimSELauncher.exe"
         self.name         = "Skyrim SE"
         self.nexus_id     = "skyrimspecialedition"
         self.protontricks = [ "xaudio2_7=native" ]
-        self.subdirectory = "Skyrim Special Edition"
+
+        self.library_root = library_root
+        self.subdirectory = subdirectory
 
     def __str__(self):
 

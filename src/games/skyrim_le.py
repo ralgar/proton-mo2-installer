@@ -8,14 +8,16 @@ import utils
 
 class SkyrimLE:
 
-    def __init__(self):
+    def __init__(self, library_root, subdirectory):
 
         self.app_id       = 72850
         self.executable   = "SkyrimLauncher.exe"
         self.name         = "Skyrim LE"
         self.nexus_id     = "skyrim"
         self.protontricks = [ "d3dcompiler_43", "d3dx9" ]
-        self.subdirectory = "Skyrim"
+
+        self.library_root = library_root
+        self.subdirectory = subdirectory
 
     def __str__(self):
 

@@ -7,7 +7,7 @@ import os
 
 import mo2
 import steam
-from games import games
+import games
 
 
 class Tui:
@@ -76,7 +76,7 @@ class Tui:
 
         # Make a list of supported AppIDs
         supported_apps = []
-        for app in games:
+        for app in games.games:
             supported_apps.append(app)
 
         # Build a list of matching AppIDs
@@ -88,12 +88,13 @@ class Tui:
 
         # Have user select their chosen game
         for pos, match in enumerate(matches):
-            print(str(pos+1) + ":", games[match]['name'])
+            print(str(pos+1) + ":", games.games[match])
         answer = int(input("\nChoose a game: ")) - 1
         appid = matches[answer-1]
 
         # Return an instantiated game object
-        return games[appid]['init']
+        library_root, subdirectory = steam.read_game_info(appid, steam_root)
+        return games.init(appid, library_root, subdirectory)
 
 
     def select_task(self):
