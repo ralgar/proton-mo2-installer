@@ -46,6 +46,7 @@ def extract_archive(game, dest, archive, strip_leading=0):
     track_file(game, dest)
 
     with libarchive.file_reader(archive) as a:
+        cwd = os.getcwd()
         os.chdir(dest)
         for entry in a:
 
@@ -60,6 +61,8 @@ def extract_archive(game, dest, archive, strip_leading=0):
 
             libarchive.extract.extract_entries([entry])
             track_file(game, os.path.join(dest, entry.pathname))
+
+        os.chdir(cwd)
 
 
 def track_file(game, file):

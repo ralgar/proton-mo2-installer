@@ -38,6 +38,7 @@ class Tui:
         print("Installing...\n")
 
         mo2.install(game)
+        print("\nSuccessfully installed MO2 in", game.mo2_dir, "!\n")
 
 
     def select_steam_root(self):

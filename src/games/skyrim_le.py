@@ -16,18 +16,21 @@ class SkyrimLE:
         self.subdirectory = "Skyrim"
 
         if getenv('XDG_CACHE_HOME'):
-            self.cache_dir = getenv('XDG_CACHE_HOME')
+            self.cache_home = getenv('XDG_CACHE_HOME')
         else:
-            self.cache_dir = path.join(getenv('HOME'), '.cache')
-        self.cache_dir = path.join(self.cache_dir, "proton-mo2-installer")
+            self.cache_home = path.join(getenv('HOME'), '.cache')
+        self.cache_dir = path.join(self.cache_home, "proton-mo2-installer")
 
         if getenv('XDG_DATA_HOME'):
-            self.data_dir = getenv('XDG_DATA_HOME')
+            self.data_home = getenv('XDG_DATA_HOME')
         else:
-            self.data_dir = path.join(getenv('HOME'), '.local/share')
-        self.data_dir = path.join(self.data_dir, "proton-mo2-installer")
+            self.data_home = path.join(getenv('HOME'), '.local/share')
+        self.data_dir = path.join(self.data_home, "proton-mo2-installer")
 
         self.mo2_dir = path.join(self.data_dir, self.nexus_id)
+
+        if path.join(getenv('HOME'), '.local/bin') in getenv('PATH'):
+            self.bin_dir = path.join(getenv('HOME'), '.local/bin')
 
 
     def __str__(self):

@@ -96,7 +96,7 @@ _parse_url() {
 	nexus_game_id=${nxm_url#nxm://}
 	nexus_game_id=${nexus_game_id%%/*}
 
-	instance_dir="$data_dir/proton-mo2-installer/modorganizer2/${nexus_game_id:?}"
+	instance_dir="$data_dir/proton-mo2-installer/${nexus_game_id:?}"
 }
 
 
