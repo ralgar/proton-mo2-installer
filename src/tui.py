@@ -36,13 +36,7 @@ class Tui:
 
         self.init_screen()
         print("Installing...\n")
-
-        mod_tools.mo2.install(game)
-        mod_tools.proton_shunt.install(game)
-
-        if callable(getattr(game, 'apply_workarounds', None)):
-            game.apply_workarounds()
-
+        game.install()
         print("\nSuccessfully installed MO2 in", game.mo2_dir, "!\n")
 
 

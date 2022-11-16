@@ -49,6 +49,17 @@ class SkyrimLE:
         paths = utils.get_paths()
         return path.join(paths[3], self.nexus_id)
 
-    def apply_workarounds(self):
+    def install(self):
+        mod_tools.mo2.install(self)
+        mod_tools.proton_shunt.install(self)
+        self.install_script_extender()
+        self.install_workarounds()
+
+    def install_script_extender(self):
+        url = 'https://skse.silverlock.org/beta'
+        url = path.join(url, 'skse_1_07_03.7z')
+        archive = utils.download_file(self.cache_dir, url)
+        utils.extract_archive(self, self.game_dir, archive, 1)
+
+    def install_workarounds(self):
         mod_tools.fnis.install(path.join(self.game_dir, 'Data'))
-        mod_tools.nemesis.install(path.join(self.game_dir, 'Data'))
