@@ -5,8 +5,8 @@ This module contains the TUI object and methods.
 import logging
 import os
 
-import steam
 import games
+import platforms
 
 
 class Tui:
@@ -41,8 +41,8 @@ class Tui:
 
     def main(self):
 
-        steam_root = self.select_steam_root()
-        game = self.select_game(steam_root)
+        platform = self.select_platform()
+        game = self.select_game(platform)
         task = self.select_task()
 
         if task == "Install":
@@ -53,7 +53,7 @@ class Tui:
             self.install_tools(game)
 
 
-    def select_steam_root(self):
+    def select_platform(self):
         '''
         Searches for Steam root candidates and, if there are more
         than one, asks the user to choose from them.
@@ -61,22 +61,19 @@ class Tui:
 
         self.init_screen()
 
-        candidates = steam.find_root(os.getenv('HOME'))
-        if len(candidates) == 1:
-            answer = 0
-        elif len(candidates) > 1:
-            for i, val in enumerate(candidates):
-                print(str(i+1) + ":", val[:-18])
-            answer = int(input("\nChoose a Steam installation: ")) - 1
-        else:
-            return False
+        for i, val in enumerate(platforms.platforms):
+            print(str(i+1) + ":", val)
+        answer = int(input("\nChoose a platform: ")) - 1
 
-        steam_root = candidates[answer][:-18]
+        if answer == 0:
+            return platforms.steam.Steam()
+        if answer == 1:
+            return platforms.steam_flatpak.SteamFlatpak()
 
-        return steam_root
+        raise Exception('Invalid platform choice.')
 
 
-    def select_game(self, steam_root):
+    def select_game(self, platform):
         '''
         Scans for games which are both supported and installed, and
         asks the user to choose from them.
@@ -84,7 +81,7 @@ class Tui:
 
         self.init_screen()
 
-        steam_apps = steam.list_appids(steam_root)
+        steam_apps = platform.list_appids()
 
         # Make a list of supported AppIDs
         supported_apps = []
@@ -105,8 +102,8 @@ class Tui:
         appid = matches[answer-1]
 
         # Return an instantiated game object
-        library_root, subdirectory = steam.read_game_info(appid, steam_root)
-        return games.init(steam_root, appid, library_root, subdirectory)
+        library_root, subdirectory = platform.read_game_info(appid)
+        return games.init(platform, appid, library_root, subdirectory)
 
 
     def select_task(self):

@@ -10,11 +10,11 @@ games = {
     489830: "Skyrim SE"
 }
 
-def init(steam_root, appid, library_root, subdirectory):
+def init(platform, appid, library_root, subdirectory):
 
     if appid == 72850:
-        game = SkyrimLE(steam_root, library_root, subdirectory)
+        game = SkyrimLE(platform, library_root, subdirectory)
     if appid == 489830:
-        game = SkyrimSE(steam_root, library_root, subdirectory)
+        game = SkyrimSE(platform, library_root, subdirectory)
 
     return game

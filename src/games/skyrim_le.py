@@ -1,7 +1,3 @@
-'''
-This module provides an object class for Skyrim LE.
-'''
-
 from os import mkdir, path
 
 import mod_tools
@@ -9,7 +5,7 @@ import utils
 
 class SkyrimLE:
 
-    def __init__(self, steam_root, library_root, subdirectory):
+    def __init__(self, platform, library_root, subdirectory):
 
         self.app_id       = 72850
         self.executable   = "SkyrimLauncher.exe"
@@ -17,7 +13,7 @@ class SkyrimLE:
         self.nexus_id     = "skyrim"
         self.protontricks = [ "d3dcompiler_43", "d3dx9" ]
 
-        self.steam_root   = steam_root
+        self.platform     = platform
         self.library_root = library_root
         self.subdirectory = subdirectory
 
@@ -35,7 +31,7 @@ class SkyrimLE:
 
     @property
     def compat_tools_dir(self):
-        return path.join(self.steam_root, 'compatibilitytools.d')
+        return path.join(self.platform.root, 'compatibilitytools.d')
 
     @property
     def data_dir(self):
