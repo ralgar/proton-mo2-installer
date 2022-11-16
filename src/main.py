@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-'''
-Main module
-'''
-
 import logging
+import sys
 
 from tui import Tui
-
 
 def main():
     '''
@@ -22,19 +18,13 @@ def main():
     )
     logging.info("===========================================================")
 
+    try:
+        assert 'linux' in sys.platform
+    except AssertionError:
+        print('This tool is designed to run on Linux only. Exiting.')
+
     tui = Tui()
-
-    steam_root = tui.select_steam_root()
-    game = tui.select_game(steam_root)
-    task = tui.select_task()
-
-    if task == "Install":
-        tui.install_tools(game)
-    elif task == "Uninstall":
-        tui.install_tools(game)
-    elif task == "Upgrade":
-        tui.install_tools(game)
-
+    tui.main()
 
 if __name__ == "__main__":
     main()

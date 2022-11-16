@@ -39,6 +39,20 @@ class Tui:
         print("\nSuccessfully installed MO2 in", game.mo2_dir, "!\n")
 
 
+    def main(self):
+
+        steam_root = self.select_steam_root()
+        game = self.select_game(steam_root)
+        task = self.select_task()
+
+        if task == "Install":
+            self.install_tools(game)
+        elif task == "Uninstall":
+            self.install_tools(game)
+        elif task == "Upgrade":
+            self.install_tools(game)
+
+
     def select_steam_root(self):
         '''
         Searches for Steam root candidates and, if there are more
