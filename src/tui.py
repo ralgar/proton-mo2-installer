@@ -38,6 +38,7 @@ class Tui:
         print("Installing...\n")
 
         mod_tools.mo2.install(game)
+        mod_tools.proton_shunt.install(game)
 
         if callable(getattr(game, 'apply_workarounds', None)):
             game.apply_workarounds()

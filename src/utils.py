@@ -23,7 +23,6 @@ def download_file(dest_dir, url):
         os.makedirs(dest_dir, 0o755)
 
     if not os.path.isfile(full_path):
-        print(":: Downloading file:", filename, '...')
         data = requests.get(url, stream=True, timeout=15)
         with open(full_path, 'wb') as file:
             for chunk in data.iter_content(chunk_size=4096):
