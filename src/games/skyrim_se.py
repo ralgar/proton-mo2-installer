@@ -4,6 +4,7 @@ This module provides an object class for Skyrim SE.
 
 from os import path
 
+import mod_tools
 import utils
 
 class SkyrimSE:
@@ -18,19 +19,6 @@ class SkyrimSE:
 
         self.library_root = library_root
         self.subdirectory = subdirectory
-
-    def __str__(self):
-
-        describe = {
-            "app_id":       self.app_id,
-            "executable":   self.executable,
-            "name":         self.name,
-            "nexus_id":     self.nexus_id,
-            "protontricks": self.protontricks,
-            "subdirectory": self.subdirectory,
-        }
-
-        return str(describe)
 
     @property
     def bin_dir(self):
@@ -53,6 +41,14 @@ class SkyrimSE:
         return utils.get_paths()[4]
 
     @property
+    def game_dir(self):
+        return path.join(self.library_root, 'common', self.subdirectory)
+
+    @property
     def mo2_dir(self):
         paths = utils.get_paths()
         return path.join(paths[3], self.nexus_id)
+
+    def apply_workarounds(self):
+        mod_tools.fnis.install(path.join(self.game_dir, 'Data'))
+        mod_tools.nemesis.install(path.join(self.game_dir, 'Data'))

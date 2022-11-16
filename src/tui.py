@@ -38,6 +38,10 @@ class Tui:
         print("Installing...\n")
 
         mo2.install(game)
+
+        if callable(getattr(game, 'apply_workarounds', None)):
+            game.apply_workarounds()
+
         print("\nSuccessfully installed MO2 in", game.mo2_dir, "!\n")
 
 
