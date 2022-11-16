@@ -5,7 +5,7 @@ This module contains the TUI object and methods.
 import logging
 import os
 
-import mo2
+import mod_tools
 import steam
 import games
 
@@ -37,7 +37,7 @@ class Tui:
         self.init_screen()
         print("Installing...\n")
 
-        mo2.install(game)
+        mod_tools.mo2.install(game)
 
         if callable(getattr(game, 'apply_workarounds', None)):
             game.apply_workarounds()
