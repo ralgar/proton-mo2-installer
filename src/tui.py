@@ -5,7 +5,6 @@ This module contains the TUI object and methods.
 import logging
 import os
 
-import mod_tools
 import steam
 import games
 
@@ -93,7 +92,7 @@ class Tui:
 
         # Return an instantiated game object
         library_root, subdirectory = steam.read_game_info(appid, steam_root)
-        return games.init(appid, library_root, subdirectory)
+        return games.init(steam_root, appid, library_root, subdirectory)
 
 
     def select_task(self):
