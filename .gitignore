@@ -1,8 +1,10 @@
-# Exclude python cache dirs
+# Exclude 'py*' (unneeded Python dev/testing files)
 __pycache__/
+build/
+*.egg-info/
 
-# Exclude 'python' dir (unneeded dev/testing files)
-python/
+# Exclude legacy (v1) files
+legacy/
 
 # Exclude log files
 *.log
