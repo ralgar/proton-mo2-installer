@@ -1,51 +1,50 @@
-# Proton MO2 Installer
+# Mod Tools Installer Framework
 [![Latest Tag](https://img.shields.io/github/v/tag/ralgar/proton-mo2-installer?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/ralgar/proton-mo2-installer/tags)
 [![Software License](https://img.shields.io/github/license/ralgar/proton-mo2-installer?style=for-the-badge&logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Github Stars](https://img.shields.io/github/stars/ralgar/proton-mo2-installer?style=for-the-badge&logo=github&logoColor=white&color=gold)](https://github.com/ralgar/proton-mo2-installer)
 
 
 ## Overview
-This project intends to make modding Bethesda games a reality for every Linux user. It provides a set of scripts, which automatically configure a fully functional instance of Mod Organizer 2.
+A framework for automating the installation of modding tools on Linux. It
+ currently has full support for Proton (Steam Play for Linux), and Bethesda
+ games, where it is capable of delivering an advanced, turn-key modding setup
+ using Mod Organizer 2, and other tools.
 
-There is also a [wiki](https://github.com/ralgar/proton-mo2-installer/wiki) to document the installation and usage of other tools.
+Due to the modular nature of the project, adding support for new games, or
+ modding tools, is as simple as writing a new module. See `CONTRIBUTING.md`
+ for more information on how you can help.
 
-**Note:** The only tested game at this time is Skyrim SE. I don't own the other games.
+There is also a [wiki](https://github.com/ralgar/proton-mo2-installer/wiki) to document the installation, usage, and troubleshooting of other tools.
 
 ### Features
-- [x] Simple, GUI-driven installer. Installs, updates, and uninstalls cleanly.
+- [x] Simple, TUI-driven installer. Installs, updates, and uninstalls cleanly.
 - [x] Installs Mod Organizer 2 with integrated LOOT.
 - [x] Installs the Script Extender for the chosen game.
 - [x] Installs custom Proton version required for Mod Organzer 2.
 - [x] Launching the game from Steam now launches Mod Organizer 2 instead (uses [Proton Shunt](https://github.com/ralgar/proton-shunt)).
-- [x] NXM links from your browser can be sent directly to Mod Organizer 2.
+- [x] NXM links from your browser will be sent directly to Mod Organizer 2.
 - [x] DynDOLOD, FNIS, Nemesis, BodySlide, Outfit Studio, and other tools all work as expected. See the [wiki](https://github.com/ralgar/proton-mo2-installer/wiki) for details.
-- [ ] Steam Deck support - I don't own one, but I *think* it should work. Please [open an issue](https://github.com/ralgar/proton-mo2-installer/issues) if it doesn't.
-- [ ] Flatpak Steam support - Not currently planned. May come later if enough people want it.
+- [x] Flatpak Steam support
+- [x] Steam Deck support
 
 
 ## Getting Started
 
-### Prerequisites
-You may need to manually install the following dependencies:
-- bsdtar
-- protontricks
+### Install using pip
 
-These dependencies should be available out-of-the-box on most systems:
-- curl
-- xdg-utils
-- zenity
+**Prerequisites:**
+- python >= 3.7
+- pip
 
-### Installation
-Installation is simple:
-1. Install your chosen game through Steam.
-2. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
-3. Run `setup`, and follow the prompts until finished.
-4. Launch the game via Steam. It will now launch MO2 instead.
+**Installation:**
 
-**Notes:**
-- The installer may interact with Steam in various ways, this may include closing running Steam instances, and launching the game to inititalize the prefix. Do NOT interfere with this process or the installation will fail to complete.
-- Configuring the prefix can take a *long* time in some cases. There is no fix for this, just be patient.
+```sh
+pip install pmf
+```
 
+### Usage
+
+Just run `pmf` from the command line. Follow the TUI from there
 
 ### Configuring Mod Organizer 2
 **On the first run of MO2:**
@@ -94,20 +93,19 @@ Here is what you need to do in order to update:
 
 1. Grab the latest stable release of the installer [here](https://github.com/ralgar/proton-mo2-installer/releases).
 2. Make sure Steam is *not* running before starting the installer.
-3. Run `setup`, following the prompts to *Update*.
+3. Run `pmf`, following the prompts to *Update*.
 
 
 ## Uninstalling
 
-Uninstalling is simple, just run `setup`, and follow the prompts to uninstall.
+Uninstalling is simple, just run `pmf`, and follow the prompts to uninstall.
 
 **Note:** The uninstaller will *never* remove the `~/.local/share/proton-mo2-installer` directory. Because this is the default location for MO2 instances, some users may have mods stored in this location. To prevent any accidental data loss, it is up to you to remove this directory manually.
 
 
 ## Credits
 
-- [Rockerbacon](https://github.com/rockerbacon) - For creating the original Lutris scripts that inspired this project.<br>
-    The main `setup` script was written from scratch, the contents of `handlers/` have been heavily reworked, and the contents of `gamesinfo/` are mostly untouched.
+- [Rockerbacon](https://github.com/rockerbacon) - For creating the original Lutris scripts that inspired this project.
 - [Frostworx](https://github.com/frostworx) - For building the custom version of Proton, required to run Mod Organizer 2 smoothly.
 
 
