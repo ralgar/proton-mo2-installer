@@ -3,7 +3,7 @@
 import logging
 import sys
 
-from tui import Tui
+from pmf.tui import Tui
 
 def main():
     '''

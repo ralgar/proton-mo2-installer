@@ -7,7 +7,8 @@ from os import path, makedirs, chmod
 import shutil
 import sys
 
-import utils
+import pmf
+from pmf import utils
 
 
 def install(game):
@@ -33,14 +34,14 @@ def install_nxm_handler(game):
     Installs NXM handler functions, and scripts.
     '''
 
-    repo_dir = path.dirname(path.abspath(sys.argv[0]))
-    repo_dir = path.join(path.dirname(repo_dir), 'handlers')
+    source_dir = path.dirname(pmf.__file__)
+    source_dir = path.join(source_dir, 'resources')
 
-    source_desktop_file = path.join(repo_dir, 'nxm-handler.desktop')
+    source_desktop_file = path.join(source_dir, 'nxm-handler.desktop')
     dest_desktop_file   = path.join(game.data_home, 'applications')
     dest_desktop_file   = path.join(dest_desktop_file, 'nxm-handler.desktop')
 
-    source_script_file = path.join(repo_dir, 'nxm-broker.sh')
+    source_script_file = path.join(source_dir, 'nxm-broker.sh')
     dest_script_file   = path.join(game.bin_dir, 'nxm-broker.sh')
 
     # Ensure the applications (.desktop) directory exists

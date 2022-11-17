@@ -1,5 +1,5 @@
-from platforms import steam
-from platforms import steam_flatpak
+from pmf.platforms import steam
+from pmf.platforms import steam_flatpak
 
 platforms = [
     "Steam",

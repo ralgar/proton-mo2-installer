@@ -5,8 +5,8 @@ This module contains the TUI object and methods.
 import logging
 import os
 
-import games
-import platforms
+from pmf import games
+from pmf import platforms
 
 
 class Tui:

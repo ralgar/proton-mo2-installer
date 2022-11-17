@@ -1,5 +1,5 @@
-from games.skyrim_le import SkyrimLE
-from games.skyrim_se import SkyrimSE
+from pmf.games.skyrim_le import SkyrimLE
+from pmf.games.skyrim_se import SkyrimSE
 
 # Provides names for AppIDs in the UI
 games = {

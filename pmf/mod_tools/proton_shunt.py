@@ -1,7 +1,7 @@
 from os import chmod, path
 from shutil import copy, move
 
-import utils
+from pmf import utils
 
 def install(game):
     '''

@@ -1,7 +1,6 @@
 from os import mkdir, path
 
-import mod_tools
-import utils
+from pmf import mod_tools, utils
 
 class SkyrimLE:
 
