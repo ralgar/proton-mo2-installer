@@ -13,15 +13,23 @@ class Steam:
         Returns a list of all possible Steam root paths.
         '''
 
-        name = "config.vdf"
+        name   = "config.vdf"
         ignore = os.path.join(path, '.var/app/com.valvesoftware.Steam')
+        result = []
 
         for root, dirs, files in os.walk(path):
             if not root.startswith(ignore):
                 if name in files:
-                    result = os.path.dirname(root)
+                    result.append(os.path.dirname(root))
 
-        return result
+        if len(result) > 1:
+            logging.critical('Found more than 1 Steam installation')
+            raise Exception('Found more than 1 Steam installation')
+        if len(result) < 1:
+            logging.critical('Could not find a Steam installation')
+            raise Exception('Could not find a Steam installation')
+
+        return result[0]
 
     def list_appids(self):
         '''
@@ -34,12 +42,11 @@ class Steam:
                 vdf_file = self.root + library + '/libraryfolders.vdf'
                 break
 
-        # No Steam root found
         if not vdf_file:
-            logging.critical('Could not find Steam root')
-            raise Exception('Could not find Steam root')
+            logging.critical('Could not find Steam root library')
+            raise Exception('Could not find Steam root libary')
 
-        # Read dict of libraries, and build a list of their AppIDs
+        # Build a list of AppIDs from all libraries
         apps = []
         with open(vdf_file, encoding='utf-8') as file:
             vdf_data = vdf.parse(file)
@@ -47,6 +54,10 @@ class Steam:
                 if not entry == 'contentstatsid':
                     for app in vdf_data['libraryfolders'][entry]['apps']:
                         apps.append(int(app))
+
+        if len(apps) < 1:
+            logging.critical('Could not find a Steam installation')
+            raise Exception('Could not find a Steam installation')
 
         return apps
 
