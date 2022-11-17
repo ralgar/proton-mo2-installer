@@ -102,8 +102,7 @@ class Tui:
         appid = matches[answer-1]
 
         # Return an instantiated game object
-        library_root, subdirectory = platform.read_game_info(appid)
-        return games.init(platform, appid, library_root, subdirectory)
+        return games.init(platform, appid)
 
 
     def select_task(self):

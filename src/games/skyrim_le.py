@@ -5,17 +5,14 @@ import utils
 
 class SkyrimLE:
 
-    def __init__(self, platform, library_root, subdirectory):
+    def __init__(self, platform):
 
         self.app_id       = 72850
         self.executable   = "SkyrimLauncher.exe"
         self.name         = "Skyrim LE"
         self.nexus_id     = "skyrim"
         self.protontricks = [ "d3dcompiler_43", "d3dx9" ]
-
         self.platform     = platform
-        self.library_root = library_root
-        self.subdirectory = subdirectory
 
     @property
     def bin_dir(self):
@@ -46,9 +43,19 @@ class SkyrimLE:
         return path.join(self.library_root, 'common', self.subdirectory)
 
     @property
+    def library_root(self):
+        library_root, val = self.platform.read_game_info(self.app_id)
+        return library_root
+
+    @property
     def mo2_dir(self):
         paths = utils.get_paths()
         return path.join(paths[3], self.nexus_id)
+
+    @property
+    def subdirectory(self):
+        val, subdirectory = self.platform.read_game_info(self.app_id)
+        return subdirectory
 
     def install(self):
         mod_tools.mo2.install(self)
