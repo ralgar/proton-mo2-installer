@@ -4,10 +4,10 @@ This module contains utility functions.
 
 import logging
 import os
-import requests
 import sys
 
 import libarchive
+import requests
 
 
 def download_file(dest_dir, url):
