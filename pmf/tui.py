@@ -5,8 +5,10 @@ This module contains the TUI object and methods.
 import logging
 import os
 
+from pmf import database
 from pmf import games
 from pmf import platforms
+from pmf import utils
 
 
 class Tui:
@@ -17,6 +19,7 @@ class Tui:
     def __init__(self):
 
         self.init_screen()
+        self.db = database.Database()
 
 
     def init_screen(self):
@@ -28,12 +31,15 @@ class Tui:
         print("\n\033[1;4mWelcome to Proton MO2 Installer v2!\033[0m\n\n")
 
 
-    def install_tools(self, game):
+    def install_tools(self, platform, game, upgrade=False):
         '''
         Installs the modding tools, and provides TUI updates on the process.
         '''
 
         self.init_screen()
+        if upgrade is False:
+            self.db.create_instance(platform.name, game.app_id)
+
         print("Installing...\n")
         game.install()
         print("\nSuccessfully installed!\n")
@@ -43,14 +49,14 @@ class Tui:
 
         platform = self.select_platform()
         game = self.select_game(platform)
-        task = self.select_task()
+        task = self.select_task(platform, game)
 
         if task == "Install":
-            self.install_tools(game)
-        elif task == "Uninstall":
-            self.install_tools(game)
-        elif task == "Upgrade":
-            self.install_tools(game)
+            self.install_tools(platform, game)
+        if task == "Upgrade":
+            self.install_tools(platform, game, True)
+        if task == "Uninstall":
+            print('Uninstall tools: Placeholder')
 
 
     def select_platform(self):
@@ -105,7 +111,7 @@ class Tui:
         return games.init(platform, appid)
 
 
-    def select_task(self):
+    def select_task(self, platform, game):
         '''
         Prompts the user to select between Install, Uninstall, and
         Upgrade. Returns the name of the chosen task as a string.
@@ -113,11 +119,10 @@ class Tui:
 
         self.init_screen()
 
-        tasks = [
-            "Install",
-            "Uninstall",
-            "Upgrade"
-        ]
+        if self.db.instance_exists(platform.name, game.app_id) is False:
+            tasks = [ 'Install' ]
+        else:
+            tasks = [ 'Upgrade', 'Uninstall' ]
 
         for pos, task in enumerate(tasks):
             print(str(pos+1) + ":", task)
