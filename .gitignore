@@ -8,3 +8,6 @@ legacy/
 
 # Exclude log files
 *.log
+
+# Excluse database files
+*.db*
