@@ -64,6 +64,14 @@ def extract_archive(game, dest, archive, strip_leading=0):
 
         os.chdir(cwd)
 
+def bin_dir():
+
+    bin_dir = os.path.join(os.getenv('HOME'), '.local/bin')
+    if bin_dir not in os.getenv('PATH'):
+        logging.critical('Could not find %s in PATH.', bin_dir)
+        sys.exit(1)
+
+    return bin_dir
 
 def get_paths():
     '''
@@ -82,12 +90,7 @@ def get_paths():
         data_home = os.path.join(os.getenv('HOME'), '.local/share')
     data_dir = os.path.join(data_home, "proton-mo2-installer")
 
-    bin_dir = os.path.join(os.getenv('HOME'), '.local/bin')
-    if bin_dir not in os.getenv('PATH'):
-        logging.critical('Could not find %s in PATH.', bin_dir)
-        sys.exit(1)
-
-    return [ bin_dir, cache_home, cache_dir, data_dir, data_home ]
+    return [ cache_home, cache_dir, data_dir, data_home ]
 
 
 def track_file(game, file):

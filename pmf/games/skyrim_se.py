@@ -14,16 +14,12 @@ class SkyrimSE:
         self.platform     = platform
 
     @property
-    def bin_dir(self):
+    def cache_dir(self):
         return utils.get_paths()[0]
 
     @property
-    def cache_dir(self):
-        return utils.get_paths()[1]
-
-    @property
     def cache_home(self):
-        return utils.get_paths()[2]
+        return utils.get_paths()[1]
 
     @property
     def compat_tools_dir(self):
@@ -31,11 +27,11 @@ class SkyrimSE:
 
     @property
     def data_dir(self):
-        return utils.get_paths()[3]
+        return utils.get_paths()[2]
 
     @property
     def data_home(self):
-        return utils.get_paths()[4]
+        return utils.get_paths()[3]
 
     @property
     def game_dir(self):
@@ -49,7 +45,7 @@ class SkyrimSE:
     @property
     def mo2_dir(self):
         paths = utils.get_paths()
-        return path.join(paths[3], self.nexus_id)
+        return path.join(paths[2], self.nexus_id)
 
     @property
     def subdirectory(self):

@@ -42,7 +42,7 @@ def install_nxm_handler(game):
     dest_desktop_file   = path.join(dest_desktop_file, 'nxm-handler.desktop')
 
     source_script_file = path.join(source_dir, 'nxm-broker.sh')
-    dest_script_file   = path.join(game.bin_dir, 'nxm-broker.sh')
+    dest_script_file   = path.join(utils.bin_dir(), 'nxm-broker.sh')
 
     # Ensure the applications (.desktop) directory exists
     if not path.isdir(path.dirname(dest_desktop_file)):
