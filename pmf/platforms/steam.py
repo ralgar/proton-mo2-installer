@@ -102,11 +102,31 @@ class Steam:
 
     def set_compat_tool(self, app_id, compat_tool):
 
+        skel = {
+            'name': compat_tool,
+            'config': '',
+            'priority': '250'
+        }
+
         with open(self.global_config, 'r', encoding='UTF-8') as fp:
             data = vdf.parse(fp)
 
-        data['InstallConfigStore']['Software']['Valve']['Steam']\
-            ['CompatToolMapping'][str(app_id)]['name'] = compat_tool
+        steam = data['InstallConfigStore']['Software']['Valve']['Steam']
+        if str(app_id) not in steam['CompatToolMapping']:
+            steam[str(app_id)] = skel
+            steam['CompatToolMapping'][str(app_id)] = skel
+        else:
+            steam['CompatToolMapping'][str(app_id)]['name'] = compat_tool
 
+        data['InstallConfigStore']['Software']['Valve']['Steam'] = steam
         with open(self.global_config, 'w', encoding='UTF-8') as fp:
             fp.write(vdf.dumps(data, pretty=True))
+
+
+class SteamFlatpak(Steam):
+
+    def __init__(self):
+        super().__init__()
+        self.name = 'Steam Flatpak'
+        root = os.path.join(os.getenv('HOME'), '.var/app/com.valvesoftware.Steam')
+        self.root = self.find_root(root)

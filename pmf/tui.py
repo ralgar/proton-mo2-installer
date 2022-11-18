@@ -68,7 +68,7 @@ class Tui:
         if answer == 0:
             return platforms.steam.Steam()
         if answer == 1:
-            return platforms.steam_flatpak.SteamFlatpak()
+            return platforms.steam.SteamFlatpak()
 
         raise Exception('Invalid platform choice.')
 
