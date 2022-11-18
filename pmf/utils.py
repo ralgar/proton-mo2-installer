@@ -86,10 +86,7 @@ def get_cache_dir():
 
     return cache_dir
 
-def get_paths():
-    '''
-    Discovers local paths (XDG Dirs, user PATH, etc.)
-    '''
+def get_data_dir():
 
     if os.getenv('XDG_DATA_HOME'):
         data_home = os.getenv('XDG_DATA_HOME')
@@ -97,7 +94,7 @@ def get_paths():
         data_home = os.path.join(os.getenv('HOME'), '.local/share')
     data_dir = os.path.join(data_home, "proton-mo2-installer")
 
-    return [ data_dir, data_home ]
+    return data_dir
 
 
 def track_file(game, file):

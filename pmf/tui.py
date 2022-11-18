@@ -36,7 +36,7 @@ class Tui:
         self.init_screen()
         print("Installing...\n")
         game.install()
-        print("\nSuccessfully installed MO2 in", game.mo2_dir, "!\n")
+        print("\nSuccessfully installed!\n")
 
 
     def main(self):

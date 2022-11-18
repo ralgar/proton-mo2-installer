@@ -14,14 +14,6 @@ class Skyrim:
         self.platform        = platform
 
     @property
-    def data_dir(self):
-        return utils.get_paths()[0]
-
-    @property
-    def data_home(self):
-        return utils.get_paths()[1]
-
-    @property
     def game_dir(self):
         return path.join(self.library_root, 'common', self.subdirectory)
 
@@ -32,8 +24,7 @@ class Skyrim:
 
     @property
     def mo2_dir(self):
-        paths = utils.get_paths()
-        return path.join(paths[0], self.nexus_id)
+        return path.join(utils.get_data_dir(), self.nexus_id)
 
     @property
     def subdirectory(self):
@@ -41,7 +32,7 @@ class Skyrim:
         return subdirectory
 
     def install(self):
-        mod_tools.mo2.install(self)
+        mod_tools.mo2.install(self, self.mo2_dir)
         mod_tools.proton_shunt.install(self)
         self.install_script_extender()
         self.install_workarounds()
