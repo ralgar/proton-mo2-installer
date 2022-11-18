@@ -9,13 +9,13 @@ import sys
 import libarchive
 import requests
 
-
-def download_file(dest_dir, url):
+def download_file(url):
     '''
     Downloads a file from the provided URL to the dest_dir, if it's not
     already present. Creates the destination path if needed.
     '''
 
+    dest_dir  = get_cache_dir()
     filename  = url.split('/')[-1]
     full_path = dest_dir + '/' + filename
 
@@ -73,16 +73,23 @@ def bin_dir():
 
     return bin_dir
 
+def get_cache_dir():
+
+    if os.getenv('XDG_CACHE_HOME'):
+        cache_dir = os.getenv('XDG_CACHE_HOME')
+    else:
+        cache_dir = os.path.join(os.getenv('HOME'), '.cache')
+    cache_dir = os.path.join(cache_dir, "proton-mo2-installer")
+
+    if not os.path.isdir(cache_dir):
+        os.makedirs(cache_dir, 0o755)
+
+    return cache_dir
+
 def get_paths():
     '''
     Discovers local paths (XDG Dirs, user PATH, etc.)
     '''
-
-    if os.getenv('XDG_CACHE_HOME'):
-        cache_home = os.getenv('XDG_CACHE_HOME')
-    else:
-        cache_home = os.path.join(os.getenv('HOME'), '.cache')
-    cache_dir = os.path.join(cache_home, "proton-mo2-installer")
 
     if os.getenv('XDG_DATA_HOME'):
         data_home = os.getenv('XDG_DATA_HOME')
@@ -90,7 +97,7 @@ def get_paths():
         data_home = os.path.join(os.getenv('HOME'), '.local/share')
     data_dir = os.path.join(data_home, "proton-mo2-installer")
 
-    return [ cache_home, cache_dir, data_dir, data_home ]
+    return [ data_dir, data_home ]
 
 
 def track_file(game, file):

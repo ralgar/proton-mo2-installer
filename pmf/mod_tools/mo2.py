@@ -23,7 +23,7 @@ def install(game):
     full_url = url_base + url_file
     install_dir = path.join(game.data_dir, game.nexus_id)
 
-    mo2_archive = utils.download_file(game.cache_dir, full_url)
+    mo2_archive = utils.download_file(full_url)
     utils.extract_archive(game, install_dir, mo2_archive)
 
     install_nxm_handler(game)
