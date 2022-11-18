@@ -2,11 +2,21 @@ import logging
 import os
 import vdf
 
+from pmf import utils
+
 class Steam:
 
     def __init__(self):
         self.name = 'Steam'
         self.root = self.find_root(os.getenv('HOME'))
+
+    @property
+    def compat_tools_path(self):
+        return os.path.join(self.root, 'compatibilitytools.d')
+
+    @property
+    def global_config(self):
+        return os.path.join(self.root, 'config', 'config.vdf')
 
     def find_root(self, path):
         '''
@@ -30,6 +40,12 @@ class Steam:
             raise Exception('Could not find a Steam installation')
 
         return result[0]
+
+    def install_compat_tool(self, game, url):
+        if not os.path.isdir(self.compat_tools_path):
+            os.mkdir(self.compat_tools_path)
+        archive = utils.download_file(url)
+        utils.extract_archive(game, self.compat_tools_path, archive)
 
     def list_appids(self):
         '''
@@ -83,3 +99,14 @@ class Steam:
             subdirectory = app_stat['installdir']
 
         return library_root, subdirectory
+
+    def set_compat_tool(self, app_id, compat_tool):
+
+        with open(self.global_config, 'r', encoding='UTF-8') as fp:
+            data = vdf.parse(fp)
+
+        data['InstallConfigStore']['Software']['Valve']['Steam']\
+            ['CompatToolMapping'][str(app_id)]['name'] = compat_tool
+
+        with open(self.global_config, 'w', encoding='UTF-8') as fp:
+            fp.write(vdf.dumps(data, pretty=True))
