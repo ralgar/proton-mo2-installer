@@ -1,21 +1,19 @@
+from os import path
+
 import sqlite3
 
 class Database:
 
-    def __init__(self):
+    def __init__(self, db_path='pmf.db'):
 
-        self.con = sqlite3.connect('pmf.db')
+        if not path.isfile(db_path):
+            seed = True
+
+        self.con = sqlite3.connect(db_path)
         self.cursor = self.con.cursor()
-        self.create_table('Instances', [
-            'ID integer PRIMARY KEY',
-            'Platform text',
-            'AppID integer',
-        ])
-        self.create_table('TrackedFiles', [
-            'ID integer PRIMARY KEY',
-            'InstanceID integer',
-            'FilePath text'
-        ])
+
+        if seed is True:
+            self.seed_database()
 
     def __del__(self):
         self.con.close()
@@ -56,6 +54,20 @@ class Database:
                 return True
 
         return False
+
+    def seed_database(self):
+
+        self.create_table('Instances', [
+            'ID integer PRIMARY KEY',
+            'Platform text',
+            'AppID integer',
+        ])
+        self.create_table('TrackedFiles', [
+            'ID integer PRIMARY KEY',
+            'InstanceID integer',
+            'FilePath text'
+        ])
+
 
     def track_file(self, instance_id, file_path):
         query = 'SELECT InstanceID, FilePath from TrackedFiles'
