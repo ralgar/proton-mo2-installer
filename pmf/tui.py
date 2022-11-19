@@ -48,7 +48,7 @@ class Tui:
     def main(self):
 
         platform = self.select_platform()
-        game = self.select_game(platform)
+        game = self.select_game(self.db, platform)
         task = self.select_task(platform, game)
 
         if task == "Install":
@@ -79,7 +79,7 @@ class Tui:
         raise Exception('Invalid platform choice.')
 
 
-    def select_game(self, platform):
+    def select_game(self, db, platform):
         '''
         Scans for games which are both supported and installed, and
         asks the user to choose from them.
@@ -108,7 +108,7 @@ class Tui:
         appid = matches[answer-1]
 
         # Return an instantiated game object
-        return games.init(platform, appid)
+        return games.init(db, platform, appid)
 
 
     def select_task(self, platform, game):

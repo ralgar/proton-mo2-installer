@@ -4,14 +4,19 @@ from pmf import mod_tools, utils
 
 class Skyrim:
 
-    def __init__(self, platform):
+    def __init__(self, db, platform):
         self.app_id          = 0
         self.executable      = ''
         self.name            = ''
         self.nexus_id        = ''
         self.protontricks    = []
         self.script_extender = ''
+        self.db              = db
         self.platform        = platform
+
+    @property
+    def db_instance_id(self):
+        return self.db.instance_id(self.platform.name)
 
     @property
     def game_dir(self):
@@ -53,9 +58,9 @@ class Skyrim:
 
 class SkyrimLE(Skyrim):
 
-    def __init__(self, platform):
+    def __init__(self, db, platform):
 
-        super().__init__(platform)
+        super().__init__(db, platform)
         self.app_id          = 72850
         self.executable      = "SkyrimLauncher.exe"
         self.name            = "Skyrim Legendary Edition"
@@ -65,9 +70,9 @@ class SkyrimLE(Skyrim):
 
 class SkyrimSE(Skyrim):
 
-    def __init__(self, platform):
+    def __init__(self, db, platform):
 
-        super().__init__(platform)
+        super().__init__(db, platform)
         self.app_id          = 489830
         self.executable      = "SkyrimSELauncher.exe"
         self.name            = "Skyrim Special Edition"

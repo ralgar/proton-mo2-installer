@@ -45,7 +45,7 @@ def install_nxm_handler(game, data_dir):
 
     # Copy and track the files, set perms
     shutil.copyfile(source_desktop_file, dest_desktop_file)
-    utils.track_file(game, dest_desktop_file)
+    game.db.track_file(game.db.instance_id(game.platform.name), dest_desktop_file)
     shutil.copyfile(source_script_file, dest_script_file)
     chmod(dest_script_file, 0o744)
-    utils.track_file(game, dest_script_file)
+    game.db.track_file(game.db.instance_id(game.platform.name), dest_script_file)

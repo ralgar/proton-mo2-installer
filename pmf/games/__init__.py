@@ -6,11 +6,11 @@ games = {
     489830: "Skyrim SE"
 }
 
-def init(platform, appid):
+def init(db, platform, appid):
 
     if appid == 72850:
-        game = SkyrimLE(platform)
+        game = SkyrimLE(db, platform)
     if appid == 489830:
-        game = SkyrimSE(platform)
+        game = SkyrimSE(db, platform)
 
     return game

@@ -43,7 +43,7 @@ def extract_archive(game, dest, archive, strip_leading=0):
     # Ensure dest exists
     if not os.path.isdir(dest):
         os.makedirs(dest, 0o755)
-    track_file(game, dest)
+    game.db.track_file(game.db.instance_id(game.platform.name), dest)
 
     with libarchive.file_reader(archive) as a:
         cwd = os.getcwd()
@@ -60,7 +60,7 @@ def extract_archive(game, dest, archive, strip_leading=0):
                 continue
 
             libarchive.extract.extract_entries([entry])
-            track_file(game, os.path.join(dest, entry.pathname))
+            game.db.track_file(game.db.instance_id(game.platform.name), os.path.join(dest, entry.pathname))
 
         os.chdir(cwd)
 
@@ -95,22 +95,3 @@ def get_data_dir():
     data_dir = os.path.join(data_home, "proton-mo2-installer")
 
     return data_dir
-
-
-def track_file(game, file):
-    '''
-    Adds a file/dir to the database list, ignoring duplicate entries.
-    '''
-
-    database = os.path.join(game.mo2_dir, "tracked.db")
-
-    unique = True
-    with open(database, 'a+', encoding='UTF-8') as fp:
-        fp.seek(0)
-        for line in fp.readlines():
-            if line.strip() == file:
-                unique = False
-
-        if unique is True:
-            fp.seek(0, 2)
-            fp.write(file + '\n')
