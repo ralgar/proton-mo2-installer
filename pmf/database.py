@@ -6,6 +6,7 @@ class Database:
 
     def __init__(self, db_path='pmf.db'):
 
+        seed = False
         if not path.isfile(db_path):
             seed = True
 
@@ -41,8 +42,7 @@ class Database:
     def create_instance(self, platform_name, app_id):
         data = 'INSERT INTO Instances (Platform, AppID) ' + \
                'VALUES ("' + platform_name + '", ' + str(app_id) + ')'
-        self.cursor.execute(data)
-        self.con.commit()
+        self.execute(data)
 
     def instance_exists(self, platform_name, app_id):
         query = 'SELECT Platform, AppID from Instances'
@@ -59,13 +59,13 @@ class Database:
 
         self.create_table('Instances', [
             'ID integer PRIMARY KEY',
-            'Platform text',
-            'AppID integer',
+            'Platform text NOT NULL',
+            'AppID integer NOT NULL',
         ])
         self.create_table('TrackedFiles', [
             'ID integer PRIMARY KEY',
-            'InstanceID integer',
-            'FilePath text'
+            'InstanceID integer NOT NULL',
+            'FilePath text NOT NULL'
         ])
 
 
