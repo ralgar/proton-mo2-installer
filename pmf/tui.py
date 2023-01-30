@@ -2,13 +2,11 @@
 This module contains the TUI object and methods.
 '''
 
-import logging
 import os
 
 from pmf import database
 from pmf import games
 from pmf import platforms
-from pmf import utils
 
 
 class Tui:
@@ -48,7 +46,7 @@ class Tui:
     def main(self):
 
         platform = self.select_platform()
-        game = self.select_game(self.db, platform)
+        game = self.select_game(platform)
         task = self.select_task(platform, game)
 
         if task == "Install":
@@ -79,7 +77,7 @@ class Tui:
         raise Exception('Invalid platform choice.')
 
 
-    def select_game(self, db, platform):
+    def select_game(self, platform):
         '''
         Scans for games which are both supported and installed, and
         asks the user to choose from them.
@@ -108,7 +106,7 @@ class Tui:
         appid = matches[answer-1]
 
         # Return an instantiated game object
-        return games.init(db, platform, appid)
+        return games.init(platform, appid)
 
 
     def select_task(self, platform, game):

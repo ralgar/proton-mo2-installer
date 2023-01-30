@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from pmf.tui import Tui
+from pmf.gui import windows
 
 def main():
     '''
@@ -21,8 +21,8 @@ def main():
     except AssertionError:
         print('This tool is designed to run on Linux only. Exiting.')
 
-    tui = Tui()
-    tui.main()
+    window = windows.MainWindow()
+    window.mainloop()
 
 if __name__ == "__main__":
     main()

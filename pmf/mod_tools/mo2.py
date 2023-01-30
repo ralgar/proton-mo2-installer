@@ -2,7 +2,6 @@
 This module provides functions for interacting with Mod Organizer 2.
 '''
 
-import logging
 from os import path, makedirs, chmod
 import shutil
 
@@ -10,7 +9,7 @@ import pmf
 from pmf import utils
 
 
-def install(game, install_path):
+def install(db, game, install_path):
 
     mo2_version = "2.4.4"
 
@@ -19,12 +18,12 @@ def install(game, install_path):
     full_url = url_base + url_file
 
     mo2_archive = utils.download_file(full_url)
-    utils.extract_archive(game, install_path, mo2_archive)
+    utils.extract_archive(db, game, install_path, mo2_archive)
 
-    install_nxm_handler(game, path.dirname(install_path))
+    install_nxm_handler(db, game, path.dirname(install_path))
 
 
-def install_nxm_handler(game, data_dir):
+def install_nxm_handler(db, game, data_dir):
     '''
     Installs NXM handler functions, and scripts.
     '''
@@ -37,7 +36,7 @@ def install_nxm_handler(game, data_dir):
     dest_desktop_file   = path.join(dest_desktop_file, 'nxm-handler.desktop')
 
     source_script_file = path.join(source_dir, 'nxm-broker.sh')
-    dest_script_file   = path.join(utils.bin_dir(), 'nxm-broker.sh')
+    dest_script_file   = path.join(utils.get_bin_dir(), 'nxm-broker.sh')
 
     # Ensure the applications (.desktop) directory exists
     if not path.isdir(path.dirname(dest_desktop_file)):
@@ -45,7 +44,7 @@ def install_nxm_handler(game, data_dir):
 
     # Copy and track the files, set perms
     shutil.copyfile(source_desktop_file, dest_desktop_file)
-    game.db.track_file(game.db.instance_id(game.platform.name), dest_desktop_file)
+    db.track_file(db.instance_id(game.platform.name), dest_desktop_file)
     shutil.copyfile(source_script_file, dest_script_file)
     chmod(dest_script_file, 0o744)
-    game.db.track_file(game.db.instance_id(game.platform.name), dest_script_file)
+    db.track_file(db.instance_id(game.platform.name), dest_script_file)

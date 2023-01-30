@@ -34,7 +34,7 @@ def download_file(url):
     return full_path
 
 
-def extract_archive(game, dest, archive, strip_leading=0):
+def extract_archive(db, game, dest, archive, strip_leading=0):
     '''
     Extracts an archive to a destination directory. Optionally strips
     (int) leading directories, for archives with a nested structure.
@@ -43,7 +43,7 @@ def extract_archive(game, dest, archive, strip_leading=0):
     # Ensure dest exists
     if not os.path.isdir(dest):
         os.makedirs(dest, 0o755)
-    game.db.track_file(game.db.instance_id(game.platform.name), dest)
+    db.track_file(db.instance_id(game.platform.name), dest)
 
     with libarchive.file_reader(archive) as a:
         cwd = os.getcwd()
@@ -52,7 +52,7 @@ def extract_archive(game, dest, archive, strip_leading=0):
 
             # Strip i leading directories, and skip empty indexes
             skip = False
-            for i in range(strip_leading):
+            for _ in range(strip_leading):
                 entry.pathname = "/".join(entry.pathname.split('/')[1:])
                 if len(entry.pathname) == 0:
                     skip = True
@@ -60,11 +60,11 @@ def extract_archive(game, dest, archive, strip_leading=0):
                 continue
 
             libarchive.extract.extract_entries([entry])
-            game.db.track_file(game.db.instance_id(game.platform.name), os.path.join(dest, entry.pathname))
+            db.track_file(db.instance_id(game.platform.name), os.path.join(dest, entry.pathname))
 
         os.chdir(cwd)
 
-def bin_dir():
+def get_bin_dir():
 
     bin_dir = os.path.join(os.getenv('HOME'), '.local/bin')
     if bin_dir not in os.getenv('PATH'):

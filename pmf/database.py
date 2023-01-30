@@ -6,14 +6,10 @@ class Database:
 
     def __init__(self, db_path='pmf.db'):
 
-        seed = False
-        if not path.isfile(db_path):
-            seed = True
-
         self.con = sqlite3.connect(db_path)
         self.cursor = self.con.cursor()
 
-        if seed is True:
+        if not path.isfile(db_path):
             self.seed_database()
 
     def __del__(self):
@@ -30,19 +26,17 @@ class Database:
 
         return None
 
-    def execute(self, data):
-        self.cursor.execute(data)
-        self.con.commit()
-
     def create_table(self, name, columns):
         data = 'CREATE TABLE IF NOT EXISTS ' + name + '('
         data = data + ', '.join(columns) + ')'
-        self.execute(data)
+        self.cursor.execute(data)
+        self.con.commit()
 
     def create_instance(self, platform_name, app_id):
         data = 'INSERT INTO Instances (Platform, AppID) ' + \
                'VALUES ("' + platform_name + '", ' + str(app_id) + ')'
-        self.execute(data)
+        self.cursor.execute(data)
+        self.con.commit()
 
     def instance_exists(self, platform_name, app_id):
         query = 'SELECT Platform, AppID from Instances'
@@ -81,7 +75,7 @@ class Database:
                     unique = False
 
         if unique is True:
-            data = 'INSERT INTO TrackedFiles (InstanceID, FilePath) ' + \
-                   'VALUES (' + str(instance_id) + ', "' + file_path + '")'
-            self.cursor.execute(data)
+            params = (instance_id, file_path)
+            data = 'INSERT INTO TrackedFiles VALUES (NULL, ?, ?)'
+            self.cursor.execute(data, params)
             self.con.commit()

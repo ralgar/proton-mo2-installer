@@ -27,7 +27,7 @@ class Steam:
         ignore = os.path.join(path, '.var/app/com.valvesoftware.Steam')
         result = []
 
-        for root, dirs, files in os.walk(path):
+        for root, _, files in os.walk(path):
             if not root.startswith(ignore):
                 if name in files:
                     result.append(os.path.dirname(root))
@@ -41,11 +41,11 @@ class Steam:
 
         return result[0]
 
-    def install_compat_tool(self, game, url):
+    def install_compat_tool(self, db, game, url):
         if not os.path.isdir(self.compat_tools_path):
             os.mkdir(self.compat_tools_path)
         archive = utils.download_file(url)
-        utils.extract_archive(game, self.compat_tools_path, archive)
+        utils.extract_archive(db, game, self.compat_tools_path, archive)
 
     def list_appids(self):
         '''

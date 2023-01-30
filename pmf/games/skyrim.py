@@ -4,19 +4,17 @@ from pmf import mod_tools, utils
 
 class Skyrim:
 
-    def __init__(self, db, platform):
+    def __init__(self, platform):
         self.app_id          = 0
         self.executable      = ''
         self.name            = ''
         self.nexus_id        = ''
         self.protontricks    = []
         self.script_extender = ''
-        self.db              = db
         self.platform        = platform
 
-    @property
-    def db_instance_id(self):
-        return self.db.instance_id(self.platform.name)
+    def db_instance_id(self, db):
+        return db.instance_id(self.platform.name)
 
     @property
     def game_dir(self):
@@ -24,7 +22,7 @@ class Skyrim:
 
     @property
     def library_root(self):
-        library_root, val = self.platform.read_game_info(self.app_id)
+        library_root, _ = self.platform.read_game_info(self.app_id)
         return library_root
 
     @property
@@ -33,34 +31,39 @@ class Skyrim:
 
     @property
     def subdirectory(self):
-        val, subdirectory = self.platform.read_game_info(self.app_id)
+        _, subdirectory = self.platform.read_game_info(self.app_id)
         return subdirectory
 
-    def install(self):
-        mod_tools.mo2.install(self, self.mo2_dir)
-        mod_tools.proton_shunt.install(self)
-        self.install_script_extender()
+    def install(self, gui, db):
+        gui.label['text'] = 'Installing Mod Organizer 2...'
+        mod_tools.mo2.install(db, self, self.mo2_dir)
+        gui.label['text'] = 'Installing Proton Shunt...'
+        mod_tools.proton_shunt.install(db, self)
+        gui.label['text'] = 'Installing SKSE...'
+        self.install_script_extender(db)
+        gui.label['text'] = 'Installing workarounds...'
         self.install_workarounds()
-        self.install_custom_proton()
+        gui.label['text'] = 'Installing custom Proton...'
+        self.install_custom_proton(db)
 
-    def install_custom_proton(self):
+    def install_custom_proton(self, db):
         url = 'https://github.com/ralgar/proton-builds/releases/download'
         url = path.join(url, 'Proton-6.17-STL-1/Proton-6.17-STL-1.tar.gz')
-        self.platform.install_compat_tool(self, url)
+        self.platform.install_compat_tool(db, self, url)
         self.platform.set_compat_tool(self.app_id, 'Proton-6.17-STL-1')
 
-    def install_script_extender(self):
+    def install_script_extender(self, db):
         archive = utils.download_file(self.script_extender)
-        utils.extract_archive(self, self.game_dir, archive, 1)
+        utils.extract_archive(db, self, self.game_dir, archive, 1)
 
     def install_workarounds(self):
         mod_tools.fnis.install(path.join(self.game_dir, 'Data'))
 
 class SkyrimLE(Skyrim):
 
-    def __init__(self, db, platform):
+    def __init__(self, platform):
 
-        super().__init__(db, platform)
+        super().__init__(platform)
         self.app_id          = 72850
         self.executable      = "SkyrimLauncher.exe"
         self.name            = "Skyrim Legendary Edition"
@@ -70,9 +73,9 @@ class SkyrimLE(Skyrim):
 
 class SkyrimSE(Skyrim):
 
-    def __init__(self, db, platform):
+    def __init__(self, platform):
 
-        super().__init__(db, platform)
+        super().__init__(platform)
         self.app_id          = 489830
         self.executable      = "SkyrimSELauncher.exe"
         self.name            = "Skyrim Special Edition"

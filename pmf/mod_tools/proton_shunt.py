@@ -3,7 +3,7 @@ from shutil import copy, move
 
 from pmf import utils
 
-def install(game):
+def install(db, game):
     '''
     Installs Proton Shunt.
     '''
@@ -18,7 +18,7 @@ def install(game):
 
     exec_file = utils.download_file(path.join(url_base, url_exec_file))
     conf_file = utils.download_file(path.join(url_base, url_conf_file))
-    game.db.track_file(game.db.instance_id(game.platform.name), conf_file)
+    db.track_file(db.instance_id(game.platform.name), conf_file)
 
     if not path.isfile(game_conf_file):
         copy(conf_file, game_conf_file)
@@ -27,4 +27,4 @@ def install(game):
         move(game_exec_file, game_exec_file + '.bak')
     copy(exec_file, game_exec_file)
     chmod(game_exec_file, 0o755)
-    game.db.track_file(game.db.instance_id(game.platform.name), game_exec_file)
+    db.track_file(db.instance_id(game.platform.name), game_exec_file)
