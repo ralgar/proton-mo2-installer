@@ -18,7 +18,6 @@ _project_name_formal="Proton MO2 Installer"
 
 MO2_VERSION="2.4.4"
 PROTON_SHUNT_VERSION="1.1.0"
-CUSTOM_PROTON_VERSION="Proton-6.17-STL-1"
 
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/$_project_name"
 install_path="${XDG_DATA_HOME:-$HOME/.local/share}/$_project_name"
@@ -258,81 +257,6 @@ _find_game_data() {
 }
 
 
-_install_custom_proton() {
-
-    local base_url="https://github.com/ralgar/proton-builds/releases/download"
-    local steam_root
-    local compat_tools
-    local current_tool
-    local game_prefix="$game_library/compatdata/$game_appid"
-
-    _download_file "${base_url}/$CUSTOM_PROTON_VERSION/$CUSTOM_PROTON_VERSION.tar.gz"
-
-    # Find the Steam global config and root directory
-    # NOTE: `find` does not provide a useful return code, so
-    #   we must use other logic to determine success
-    steam_conf="$(\
-        find "$HOME" \
-        -name config.vdf \
-        -print -quit \
-        2> /dev/null \
-    )"
-    if [[ ! -f $steam_conf ]] ; then
-        printf "Could not locate config.vdf!\n"
-        _dialog error no_steam_config
-        return 1
-    fi
-
-    # Determine the Steam root directory
-    steam_root="$(dirname "$steam_conf")"
-    steam_root="$(dirname "$steam_root")"
-
-    # Create compatibilitytools.d if it doesn't exists
-    compat_tools="$steam_root/compatibilitytools.d"
-    if [[ ! -d $compat_tools ]] ; then
-        mkdir "$compat_tools" || return 1
-    fi
-
-    # Extract the custom Proton
-    if [[ ! -d $compat_tools/$CUSTOM_PROTON_VERSION ]] ; then
-        if bsdtar -C "$compat_tools" -xf "$cache_dir/$CUSTOM_PROTON_VERSION.tar.gz" ; then
-            _track_file "$compat_tools/$CUSTOM_PROTON_VERSION" || return 1
-        else
-            printf "Failed to extract compatbility tool!\n"
-            return 1
-        fi
-    fi
-
-    # Remap the game's compatibility tool
-    current_tool="$("$script_dir/utils/compat-tool-remap.py" \
-        -a "$game_appid" -c "$steam_conf" -l current)"
-    if [[ $current_tool != "$CUSTOM_PROTON_VERSION" ]] ; then
-        # Backup and remove the original game prefix if present
-        # Return failure if no prefix is found
-        if [[ -d $game_prefix ]] ; then
-            mv "$game_prefix" "$game_prefix.bak.$(date +%s)" || return 1
-        fi
-
-        # Remap the compat tool
-        if ! "$script_dir/utils/compat-tool-remap.py" \
-            -a "$game_appid" -c "$steam_conf" -t "$CUSTOM_PROTON_VERSION"
-        then
-            return 1
-        fi
-    else
-        printf "Skipping compatbility tool remap.\n"
-    fi
-
-    # Initialize a new game prefix with custom Proton
-    if [[ ! -d $game_prefix ]] ; then
-        touch "$game_data/proton-shunt.lock" || return 1
-        steam -silent -applaunch "$game_appid" --init-prefix &>/dev/null &
-        while [[ -f $game_data/proton-shunt.lock ]] ; do
-            sleep 1
-        done
-    fi
-}
-
 #_install_enb() {
 #
 #    _download_file "$game_enb_url"
@@ -383,9 +307,6 @@ _install_main() {
     #    desc="Install ENB"
     #    run _install_enb
     #fi
-
-    echo "# Installing custom Proton..." ; sleep 1
-    _install_custom_proton || return 1
 
     echo "# Configuring the game's prefix..." ; sleep 1
     _install_verbs || return 1
