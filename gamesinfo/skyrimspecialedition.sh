@@ -6,5 +6,5 @@ game_nexusid="skyrimspecialedition"
 game_appid=489830
 game_executable="SkyrimSELauncher.exe"
 game_protontricks=("xaudio2_7=native")
-game_scriptextender_url="https://github.com/ianpatt/skse64/releases/download/v2.2.2/skse64_2_02_02.7z"
+game_scriptextender_url="https://github.com/ianpatt/skse64/releases/download/v2.2.6/skse64_2_02_06.7z"
 game_scriptextender_strip_dirs=1
