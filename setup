@@ -560,7 +560,7 @@ _select_game() {
 
 # Select the task to perform on chosen game
 _select_task() {
-    if [[ ! -d $instance_path ]] ; then
+    if [[ ! -f "$instance_path/tracked_files.txt" ]] ; then
         if ! chosen_task="$(zenity \
             --title="$_project_name_formal" \
             --width 640 --height 480 \
@@ -656,6 +656,9 @@ _uninstall() {
         mv "$file" "${file%.bak}"
         printf "Restored: %s\n" "${file%.bak}"
     done
+
+    # Remove the tracked_files DB
+    rm -f "$instance_path/tracked_files.txt"
 
     printf "\n%s was not removed, in order to prevent accidental data loss.\n" "$install_path"
     printf "\nUninstall completed!\n"
