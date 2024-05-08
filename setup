@@ -343,8 +343,6 @@ _install_mo2() {
 
     cp "$script_dir/handlers/nxm-handler.desktop" "$share/applications" || return 1
     _track_file "$share/applications/nxm-handler.desktop" || return 1
-    xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
-
     if [[ $PATH =~ $HOME/.local/bin ]] ; then
         if [[ ! -d "$HOME/.local/bin" ]] ; then
             mkdir -p "$HOME/.local/bin" || return 1
@@ -357,6 +355,8 @@ _install_mo2() {
         sed -i "s|nxm-broker.sh|$install_path/nxm-broker.sh|" \
             "$share/applications/nxm-handler.desktop" || return 1
     fi
+
+    xdg-mime default nxm-handler.desktop x-scheme-handler/nxm || return 1
 
     # FNIS and Nemesis workarounds
     for dir in GenerateFNIS_for_{Modders,Users} ; do
