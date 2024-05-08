@@ -185,19 +185,21 @@ _find_steam_libraries() {
     # Find Steam root library VDF file
     # NOTE: `find` does not provide a useful return code, so
     #   we must use other logic to determine success
-    vdf_file="$(find "$HOME" \
-        ! -path '*/compatdata/*' \
-        ! -path '*/config/*' \
-        -name libraryfolders.vdf \
-        -print -quit \
-        2> /dev/null \
-    )"
-
-    # Ensure we found a VDF file
-    if [[ ! -f "$vdf_file" ]] ; then
-        printf "\nERROR: Unable to find a Steam installation for user.\n\n"
-        _dialog error no_steam
-        return 1
+    vdf_file="${XDG_DATA_HOME:-$HOME/.local/share}/Steam/config/libraryfolders.vdf"
+    if [[ ! -f $vdf_file ]] ; then
+        vdf_file="$(find "$HOME" \
+            ! -path '*/compatdata/*' \
+            ! -path '*/config/*' \
+            -name libraryfolders.vdf \
+            -print -quit \
+            2> /dev/null \
+        )"
+        # Ensure we found a VDF file
+        if [[ ! -f "$vdf_file" ]] ; then
+            printf "\nERROR: Unable to find a Steam installation for user.\n\n"
+            _dialog error no_steam
+            return 1
+        fi
     fi
 
     # Read the VDF file
