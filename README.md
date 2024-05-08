@@ -112,6 +112,12 @@ Uninstalling is simple, just run `setup`, and follow the prompts to uninstall.
 
 **Note:** The uninstaller will *never* remove the `~/.local/share/proton-mo2-installer` directory. Because this is the default location for MO2 instances, some users may have mods stored in this location. To prevent any accidental data loss, it is up to you to remove this directory manually.
 
+## Contributing
+
+Contributions are welcome and encouraged. This project is pretty much in
+ maintenance mode due to a lack of interest on my part, but I'm happy to
+ review small features, improvements, or bug fixes.
+
 ## Acknowledgements
 
 - [Rockerbacon](https://github.com/rockerbacon) - For creating the original
