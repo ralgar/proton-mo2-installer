@@ -21,6 +21,9 @@ _dialog() {
         error)
             type=error
             case $2 in
+                handling_failure)
+                    msg="\nFailed to handle the NXM link.\n\nIs Protontricks installed and working?"
+                    ;;
                 invalid_url)
                     msg="\nAn invalid URL was provided. Aborting download."
                     ;;
@@ -105,14 +108,14 @@ _start_download() {
 	# If MO2 is running, then pass the URL to it, else start MO2
 	if pgrep -f "ModOrganizer.exe" ; then
 		printf "INFO: Sending download to running Mod Organizer 2 instance.\n"
-		if ! WINEESYNC=1 WINEFSYNC=1 protontricks-launch \
-				--appid "$game_appid" "$instance_dir/nxmhandler.exe" "$nxm_url"
-		then
+		if ! protontricks-launch --appid "$game_appid" "$instance_dir/nxmhandler.exe" "$nxm_url" ; then
+            _dialog error handling_failure
 			return 1
 		fi
 	else
 		printf "INFO: MO2 is not running. launching it now.\n"
 		if ! steam -applaunch "$game_appid" "$nxm_url" ; then
+            _dialog error handling_failure
 			return 1
 		fi
 	fi
